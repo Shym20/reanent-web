@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@import "react-image-gallery/styles/css/image-gallery.css";
+@font-face {
+  font-family: "Gilroy";
+  src: url("/src/assets/fonts/Gilroy-Medium.woff2") format("woff2"),
+       url("/src/assets/fonts/Gilroy-Medium.woff") format("woff"),
+       url("/src/assets/fonts/Gilroy-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+body {
+  font-family: "Gilroy", sans-serif;
+}
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;  
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;    
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;             
+}
+
