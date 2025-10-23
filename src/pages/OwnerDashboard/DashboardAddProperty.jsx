@@ -103,7 +103,7 @@ const DashboardAddProperty = () => {
       formData.append("file", file);
 
       try {
-        const res = await fetch(`${API_BASE_URL}api/user/s3/upload`, {
+        const res = await fetch(`${API_BASE_URL}/api/user/s3/upload`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
