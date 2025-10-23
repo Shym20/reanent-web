@@ -20,7 +20,7 @@ export default function Survey() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}api/constants?key=7089887460`);
+        const res = await fetch(`${API_BASE_URL}/api/constants?key=7089887460`);
         const data = await res.json();
         if (data?.status === 200) {
           const surveyData = data.data.survey_questions;
