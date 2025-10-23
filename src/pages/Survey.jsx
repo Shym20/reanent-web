@@ -80,7 +80,7 @@ export default function Survey() {
     try {
       const uniqueFactor = contact; // ✅ email or mobile directly
       const res = await fetch(
-        `${API_BASE_URL}api/user/survey/submit-answers/${uniqueFactor}`,
+        `${API_BASE_URL}/api/user/survey/submit-answers/${uniqueFactor}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
