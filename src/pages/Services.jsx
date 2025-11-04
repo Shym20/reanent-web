@@ -20,11 +20,11 @@ const features = [
         description: "Connect with verified tenants and owners for secure interactions.",
 
     },
-    {
-        icon: BetterIcon2,
-        title: "Digital Docs & Checklists",
-        description: "Specialized healthcare for infants, children, and teenagers."
-    },
+    // {
+    //     icon: BetterIcon2,
+    //     title: "Digital Docs & Checklists",
+    //     description: "Specialized healthcare for infants, children, and teenagers."
+    // },
     {
         icon: BetterIcon3,
         title: "Instant Chat",

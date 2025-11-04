@@ -32,17 +32,49 @@ class OwnerApi extends HttpClient {
   };
 
   getTenantInterestsConfig = ApiRoutes.Owner.getTenantInterests;
-  
+  updateInterestStatusConfig = ApiRoutes.Owner.updateInterestStatus;
+  submitFormStartTenancyFromOwnerConfig = ApiRoutes.Owner.submitFormStartTenancyFromOwner;
+  ownerPropertyChannelConfig = ApiRoutes.Owner.ownerPropertyChannel;
+  getChannelConversationByIdConfig = ApiRoutes.Owner.getChannelConversationById;
+
 
   getTenantInterests = async ({ status = "", page = 1, limit = 10 }) => {
-  return this.instance({
-    method: this.getTenantInterestsConfig.Method,
-    url: `${this.getTenantInterestsConfig.Endpoint}status=${status}&page=${page}&limit=${limit}`,
-  });
-};
+    return this.instance({
+      method: this.getTenantInterestsConfig.Method,
+      url: `${this.getTenantInterestsConfig.Endpoint}status=${status}&page=${page}&limit=${limit}`,
+    });
+  };
 
+  updateInterestStatus = async (payload) => {
+    return this.instance({
+      method: this.updateInterestStatusConfig.Method,
+      url: `${this.updateInterestStatusConfig.Endpoint}`,
+      data: payload,
+    });
+  };
 
-  
+  submitFormStartTenancyFromOwner = async (payload) => {
+    return this.instance({
+      method: this.submitFormStartTenancyFromOwnerConfig.Method,
+      url: `${this.submitFormStartTenancyFromOwnerConfig.Endpoint}`,
+      data: payload,
+    });
+  };
+
+  ownerPropertyChannel = async () => {
+    return this.instance({
+      method: this.ownerPropertyChannelConfig.Method,
+      url: `${this.ownerPropertyChannelConfig.Endpoint}`,
+    });
+  };
+
+   getChannelConversationById = async (conversationId) => {
+    return this.instance({
+      method: this.getChannelConversationByIdConfig.Method,
+      url: `${this.getChannelConversationByIdConfig.Endpoint}/${conversationId}/messages`,
+    });
+  };
+
 
 }
 

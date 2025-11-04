@@ -8,6 +8,10 @@ import AuthApi from "../apis/auth/auth.api";
 import { updateToken, updateUser } from "../redux/redux-slice/user.slice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { messaging } from "../configs/firebase.config";
+import { getToken, onMessage } from "firebase/messaging";
+import { registerFcmToken } from "../apis/notification/notification.api";
+
 
 const Login = () => {
   const [contact, setContact] = useState(""); // ✅ unified field (email or mobile)
@@ -42,6 +46,48 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleFcmRegistration = async (jwtToken) => {
+    try {
+      // Ask for permission if not already granted
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        console.warn("Notification permission not granted.");
+        return;
+      }
+
+      // Get the current token
+      const currentToken = await getToken(messaging, {
+        vapidKey: "BBpLROZ497jM79JPw1oYhO8cfo-vjy2Hb4Yw7-nhehhsRMv5sagvbRy9mb5S8UdWUMq4Qth4RgUsRoM-b_HMqa4",
+      });
+
+      if (currentToken) {
+       
+        console.log("FCM Token retrieved:", currentToken);
+        await registerFcmToken(currentToken, jwtToken);
+
+        // Listen for token refresh and auto-update backend
+        if (messaging.onTokenRefresh) {
+          messaging.onTokenRefresh(async () => {
+            try {
+              const newToken = await getToken(messaging, {
+                vapidKey: "BBpLROZ497jM79JPw1oYhO8cfo-vjy2Hb4Yw7-nhehhsRMv5sagvbRy9mb5S8UdWUMq4Qth4RgUsRoM-b_HMqa4",
+              });
+              console.log("🔄 FCM Token refreshed:", newToken);
+              await registerFcmToken(newToken, jwtToken);
+            } catch (refreshError) {
+              console.error("Error refreshing FCM token:", refreshError);
+            }
+          });
+        }
+      } else {
+        console.warn("No registration token available. Permission required.");
+      }
+    } catch (err) {
+      console.error("Error handling FCM registration:", err);
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -59,15 +105,20 @@ const Login = () => {
       }
 
       const res = await authApi.login(payload);
+console.log("heh console token is here", res.data.token);
 
       if (res?.data?.token) {
         dispatch(updateToken(res.data.token));
         dispatch(updateUser(res.data.user));
 
         toast.success("Login successful 🎉");
+        // Register FCM token after login
+        await handleFcmRegistration(res.data.token);
+
         setTimeout(() => {
-          navigate("/");
+          navigate("/dashboard-owner");
         }, 1500);
+
       } else {
         toast.error(res?.data?.message || "Login failed");
       }
@@ -105,9 +156,8 @@ const Login = () => {
                 type="text"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                className={`w-full focus:ring-2 focus:ring-teal-600 font-poppins rounded-md px-2 py-2 focus:outline-none border-2 ${
-                  errors.contact ? "border-red-500" : "border-[#E5E5E5]"
-                } text-[#404040]`}
+                className={`w-full focus:ring-2 focus:ring-teal-600 font-poppins rounded-md px-2 py-2 focus:outline-none border-2 ${errors.contact ? "border-red-500" : "border-[#E5E5E5]"
+                  } text-[#404040]`}
                 placeholder="Enter your mobile number or email"
               />
               {errors.contact && (
@@ -123,9 +173,8 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full font-poppins rounded-md px-2 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-teal-600 border-2 ${
-                  errors.password ? "border-red-500" : "border-[#E5E5E5]"
-                } text-[#404040]`}
+                className={`w-full font-poppins rounded-md px-2 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-teal-600 border-2 ${errors.password ? "border-red-500" : "border-[#E5E5E5]"
+                  } text-[#404040]`}
                 placeholder="Enter Your Password"
               />
               <button

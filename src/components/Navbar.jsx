@@ -83,7 +83,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <motion.div
@@ -164,9 +164,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user && token ? (
               <>
-                <button onClick={() => navigate("/notifications")} className="w-7 h-7 text-gray-700">
-                  <BellIcon className="w-full h-full" />
-                </button>
+                
                 <div ref={dropdownRef} className="relative p-1.5 rounded-3xl bg-[#033E4A]">
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}

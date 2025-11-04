@@ -8,6 +8,12 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuthenticated } from "./hooks/useAuthenticated.hook";
+import { useEffect } from "react";
+import { messaging } from "./configs/firebase.config"; // your firebase.js config
+import { onMessage } from "firebase/messaging";
+import { toast } from "react-toastify";
+
+
 
 import "./App.css";
 import Home from "./pages/Home";
@@ -24,7 +30,7 @@ import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import TermsConditions from "./pages/TermsConditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Notifications from "./pages/Notification";
+import Notifications from "./pages/TenantDashboard/DashboardNotification";
 import Survey from "./pages/Survey";
 
 import DashboardLayout from "./DashboardLayout";
@@ -52,6 +58,8 @@ import DashboardTenantRating from "./pages/TenantDashboard/DashboardRating";
 import DashboardPropertyDetail from "./pages/TenantDashboard/DashboardPropertyDetails";
 import DashboardPeopleDetails from "./pages/TenantDashboard/DashboardPeopleDetails";
 import DashboardPropertyDetailToOwner from "./pages/OwnerDashboard/DashboardPropertyDetailToOwner";
+import DashboardTenantChannel from "./pages/TenantDashboard/DashboardChannel";
+import DashboardCurrentTenants from "./pages/OwnerDashboard/DashboardCurrentTenants";
 
 function AppContent() {
   const location = useLocation();
@@ -62,6 +70,16 @@ function AppContent() {
     location.pathname.startsWith("/dashboard") ||
     ["/login", "/signup", "/forget-password", "/otp", "/survey", "/reset-password"].includes(location.pathname);
 
+  useEffect(() => {
+
+  // Listen for foreground messages
+  onMessage(messaging, (payload) => {
+    console.log("Message received in foreground: ", payload);
+    toast.info(`${payload.notification?.title}: ${payload.notification?.body}`);
+  });
+}, []);
+
+
   return (
     <>
       {!hideNavbarFooter && <Navbar />}
@@ -71,7 +89,6 @@ function AppContent() {
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/notifications" element={<Notifications />} />
         <Route path="/properties-list" element={<PropertiesList />} />
         <Route path="/property-details" element={<PropertyDetail />} />
         <Route path="/owner-property-review" element={<OwnerPropertyReviewDetail />} />
@@ -91,8 +108,8 @@ function AppContent() {
             isAuthenticated ? <DashboardLayout /> : <Navigate to="/login" />
           }
         >
-          <Route index element={<OwnerDashboard />} />
-          
+          <Route index element={<DashboardCurrentTenants />} /> 
+          <Route path="dashboard" element={<OwnerDashboard />} />
           <Route path="history" element={<DashboardHistoryPage />} />
           <Route path="search" element={<DashboardSearchPage />} />
           <Route path="my-properties" element={<DashboardMyProperties />} />
@@ -100,6 +117,7 @@ function AppContent() {
           <Route path="tenant-interest" element={<DashboardTenantInterest />} />
           <Route path="rent-utilities" element={<DashboardRentUtilities />} />
           <Route path="add-property" element={<DashboardAddProperty />} />
+          <Route path="add-property/:id?" element={<DashboardAddProperty />} />
           <Route path="documents" element={<DashboardDocument />} />
           <Route path="channel" element={<DashboardChannel />} />
           <Route path="rating" element={<DashboardRating />} />
@@ -113,6 +131,7 @@ function AppContent() {
         >
           <Route index element={<TenantDashboard />} />
           <Route path="your-stay" element={<DashboardYourStay />} />
+          <Route path="channel" element={<DashboardTenantChannel />} />
           <Route path="saved-properties" element={<DashboardLikedPage />} />
           <Route path="my-interest" element={<DashboardMyInterest />} />
           <Route path="rent-utilities" element={<DashboardTenantRentUtilities />} />
@@ -122,6 +141,7 @@ function AppContent() {
           <Route path="people-details/:id" element={<DashboardPeopleDetails />} />
           <Route path="history" element={<DashboardHistoryPage />} />
           <Route path="search" element={<DashboardSearchPage />} />
+          <Route path="notifications" element={<Notifications />} />
           
         </Route>
 

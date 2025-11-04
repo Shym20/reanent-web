@@ -33,26 +33,66 @@ class TenantApi extends HttpClient {
 
   registerInterestConfig = ApiRoutes.Tenant.registerInterest;
   getAllInterestsConfig = ApiRoutes.Tenant.getAllInterests;
+  savePropertyConfig = ApiRoutes.Tenant.saveProperty;
+  unsavePropertyConfig = ApiRoutes.Tenant.unsaveProperty;
+  getAllSavedPropertyConfig = ApiRoutes.Tenant.getAllSavedProperty;
+  acceptStartTenancyConfig = ApiRoutes.Tenant.acceptStartTenancy;
+  rejectStartTenancyConfig = ApiRoutes.Tenant.rejectStartTenancy;
 
-  registerInterest = async (propertyId) => {
-    return this.instance({
-      method: this.registerInterestConfig.Method,
-      url: `${this.registerInterestConfig.Endpoint}/${propertyId}`,
-      headers: {},
-    });
-  };
 
-  getAllInterests = async () => {
+registerInterest = async (propertyId, message) => {
+  return this.instance({
+    method: this.registerInterestConfig.Method,
+    url: `${this.registerInterestConfig.Endpoint}/${propertyId}`,
+    data: { message }, 
+    headers: {},
+  });
+};
+getAllInterests = async () => {
     return this.instance({
       method: this.getAllInterestsConfig.Method,
       url: this.getAllInterestsConfig.Endpoint,
       headers: {},
     });
-  };
+};
+saveProperty = async (propertyId) => {
+  return this.instance({
+    method: this.savePropertyConfig.Method,
+    url: `${this.savePropertyConfig.Endpoint}/${propertyId}`, 
+    headers: {},
+  });
+};
+unsaveProperty = async (propertyId) => {
+  return this.instance({
+    method: this.unsavePropertyConfig.Method,
+    url: `${this.unsavePropertyConfig.Endpoint}/${propertyId}`, 
+    headers: {},
+  });
+};
+getAllSavedProperty = async () => {
+  return this.instance({
+    method: this.getAllSavedPropertyConfig.Method,
+    url: `${this.getAllSavedPropertyConfig.Endpoint}`, 
+    headers: {},
+  });
+};
+acceptStartTenancy = async (tenantStayId) => {
+  return this.instance({
+    method: this.acceptStartTenancyConfig.Method,
+    url: this.acceptStartTenancyConfig.Endpoint,
+    data: { tenantStayId },
+    headers: {},
+  });
+};
 
- 
-
-
+rejectStartTenancy = async (tenantStayId, remarks) => {
+  return this.instance({
+    method: this.rejectStartTenancyConfig.Method,
+    url: this.rejectStartTenancyConfig.Endpoint,
+    data: { tenantStayId, remarks },
+    headers: {},
+  });
+};
 
 
 }

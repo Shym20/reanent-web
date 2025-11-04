@@ -52,6 +52,10 @@ const ApiRoutes = {
       Endpoint: "/api/user/property/post-property/",
       Method: HttpMethod.Post,
     },
+    editProperty: {
+      Endpoint: `/api/user/property/update-property-details`,
+      Method: HttpMethod.Patch,
+    },
     getMyProperties: {
       Endpoint: "/api/user/property/get-all-posted-properties",
       Method: HttpMethod.Get,
@@ -93,12 +97,59 @@ const ApiRoutes = {
     getAllInterests: {
       Endpoint: "api/user/property/interest/get-all-previous-intersets-on-properties",
       Method: HttpMethod.Get,
+    },
+    saveProperty: {
+      Endpoint: "api/user/property/save",
+      Method: HttpMethod.Post,
+    },
+    unsaveProperty: {
+      Endpoint: "api/user/property/save",
+      Method: HttpMethod.Delete,
+    },
+    getAllSavedProperty: {
+      Endpoint: "api/user/property/saved",
+      Method: HttpMethod.Get,
+    },
+    acceptStartTenancy: {
+      Endpoint: "api/user/property/tenant-approve",
+      Method: HttpMethod.Patch,
+    },
+     rejectStartTenancy: {
+      Endpoint: "api/user/property/tenant-reject",
+      Method: HttpMethod.Patch,
     }
   },
-
   Owner: {
     getTenantInterests: {
       Endpoint: "api/user/property/interest/owner-interests?",
+      Method: HttpMethod.Get,
+    },
+    updateInterestStatus: {
+      Endpoint: "api/user/property/interest/update-status",
+      Method: HttpMethod.Patch,
+    },
+    ownerPropertyChannel: {
+      Endpoint: "api/user/property/conversations",
+      Method: HttpMethod.Get,
+    },
+    getChannelConversationById: {
+      Endpoint: "api/user/property/conversation",
+      Method: HttpMethod.Get,
+    },
+    submitFormStartTenancyFromOwner: {
+      Endpoint: "api/user/property/request-tenant",
+      Method: HttpMethod.Patch,
+    },
+  },
+  Chat: {
+    sendMessage: {
+      Endpoint: "api/user/property/conversation",
+      Method: HttpMethod.Post,
+    },
+  },
+  Notification: {
+    GetAllNotification: {
+      Endpoint: "/api/user/notifications",
       Method: HttpMethod.Get,
     },
   },

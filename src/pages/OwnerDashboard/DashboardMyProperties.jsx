@@ -4,12 +4,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IoSearch } from "react-icons/io5";
 import { FiX, FiStar } from "react-icons/fi";
 import PropertyApi from '../../apis/property/property.api'
+import OwnerApi from "../../apis/owner/owner.api";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdEmail } from "react-icons/md";
 import { FaPhone } from "react-icons/fa6";
+import { Bell } from "lucide-react";
 
 const propertyApi = new PropertyApi();
+const ownerApi = new OwnerApi();
+
 
 const TenantRatingModal = ({ isOpen, onClose, onRateAndRemove, tenant, property }) => {
   // 5-point scale for each parameter
@@ -188,7 +192,7 @@ const CircleRating = ({ value, onChange, max = 5 }) => {
 
 
 const DashboardMyProperties = () => {
-  const [activeTab, setActiveTab] = useState("AsTenant");
+
   const [isOpen, setIsOpen] = useState(false);
   const [assignedTenants, setAssignedTenants] = useState({});
   const [listedStatus, setListedStatus] = useState({});
@@ -201,7 +205,12 @@ const DashboardMyProperties = () => {
   const [tenantToRate, setTenantToRate] = useState(null);
   const [propertyForRating, setPropertyForRating] = useState(null);
   const [showConfirmRemoveModal, setShowConfirmRemoveModal] = useState(false);
-const [pendingRemoval, setPendingRemoval] = useState(null);
+  const [showStartTenancyModal, setShowStartTenancyModal] = useState(false);
+const [selectedTenantForTenancy, setSelectedTenantForTenancy] = useState(null);
+const [selectedPropertyForTenancy, setSelectedPropertyForTenancy] = useState(null);
+
+  const navigate = useNavigate();
+  const [pendingRemoval, setPendingRemoval] = useState(null);
 
 
 
@@ -225,7 +234,7 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
               address: p.address,
               status: p.status,
               type: p.type,
-              size: p.size,
+              sizeV2: p.sizeV2,
               price: p.rent,
               aboutPlace: `${p.rooms} Rooms • ${p.kitchen} Kitchen • ${p.baths} Baths • ${p.bed_rooms} Beds`,
               description: p.description,
@@ -297,78 +306,78 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
 
 
 
-  const handleAssignTenant = async (propertyId, tenantId) => {
-    try {
-      if (!tenantId) {
-        // 🚫 Remove tenant flow
-        const currentTenant = properties.find((p) => p.id === propertyId)?.tenants[0];
+  // const handleAssignTenant = async (propertyId, tenantId) => {
+  //   try {
+  //     if (!tenantId) {
+  //       // 🚫 Remove tenant flow
+  //       const currentTenant = properties.find((p) => p.id === propertyId)?.tenants[0];
 
-        if (!currentTenant) return;
+  //       if (!currentTenant) return;
 
-        const payload = {
-          userId: currentTenant.userId,
-          propertyId: propertyId,
-          status: "rent",
-        };
+  //       const payload = {
+  //         userId: currentTenant.userId,
+  //         propertyId: propertyId,
+  //         status: "rent",
+  //       };
 
-        const res = await propertyApi.deAssociateTenant(payload);
+  //       const res = await propertyApi.deAssociateTenant(payload);
 
-        if (res?.status === 200 || res?.status === "success") {
-          console.log("Tenant de-associated successfully", res.data);
-          toast.success("Tenant Removed Successfully");
+  //       if (res?.status === 200 || res?.status === "success") {
+  //         console.log("Tenant de-associated successfully", res.data);
+  //         toast.success("Tenant Removed Successfully");
 
-          // Update UI
-          setAssignedTenants((prev) => ({
-            ...prev,
-            [propertyId]: null,
-          }));
+  //         // Update UI
+  //         setAssignedTenants((prev) => ({
+  //           ...prev,
+  //           [propertyId]: null,
+  //         }));
 
-          // Also clear from properties state so dropdown resets
-          setProperties((prev) =>
-            prev.map((p) =>
-              p.id === propertyId ? { ...p, tenants: [] } : p
-            )
-          );
-        } else {
-          toast.error("Failed to remove tenant");
-        }
-      } else {
-        // ✅ Assign tenant flow
-        const selectedTenant = properties
-          .find((p) => p.id === propertyId)
-          .tenantsInterests.find((t) => t.tenantId === tenantId);
+  //         // Also clear from properties state so dropdown resets
+  //         setProperties((prev) =>
+  //           prev.map((p) =>
+  //             p.id === propertyId ? { ...p, tenants: [] } : p
+  //           )
+  //         );
+  //       } else {
+  //         toast.error("Failed to remove tenant");
+  //       }
+  //     } else {
+  //       // ✅ Assign tenant flow
+  //       const selectedTenant = properties
+  //         .find((p) => p.id === propertyId)
+  //         .tenantsInterests.find((t) => t.tenantId === tenantId);
 
-        setAssignedTenants((prev) => ({
-          ...prev,
-          [propertyId]: selectedTenant,
-        }));
+  //       setAssignedTenants((prev) => ({
+  //         ...prev,
+  //         [propertyId]: selectedTenant,
+  //       }));
 
-        const payload = {
-          userId: tenantId,
-          propertyId: propertyId,
-        };
+  //       const payload = {
+  //         userId: tenantId,
+  //         propertyId: propertyId,
+  //       };
 
-        const res = await propertyApi.associateTenant(payload);
+  //       const res = await propertyApi.associateTenant(payload);
 
-        if (res?.status === 200 || res?.status === "success") {
-          console.log("Tenant associated successfully", res.data);
-          toast.success("Tenant Associated Successfully");
+  //       if (res?.status === 200 || res?.status === "success") {
+  //         console.log("Tenant associated successfully", res.data);
+  //         toast.success("Tenant Associated Successfully");
 
-          // Update properties state
-          setProperties((prev) =>
-            prev.map((p) =>
-              p.id === propertyId ? { ...p, tenants: [selectedTenant] } : p
-            )
-          );
-        } else {
-          toast.error("Failed to associate tenant");
-        }
-      }
-    } catch (err) {
-      console.error("Error in tenant assign/remove:", err);
-      toast.error("Something went wrong");
-    }
-  };
+  //         // Update properties state
+  //         setProperties((prev) =>
+  //           prev.map((p) =>
+  //             p.id === propertyId ? { ...p, tenants: [selectedTenant] } : p
+  //           )
+  //         );
+  //       } else {
+  //         toast.error("Failed to associate tenant");
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error("Error in tenant assign/remove:", err);
+  //     toast.error("Something went wrong");
+  //   }
+  // };
 
 
 
@@ -395,7 +404,26 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
   };
 
 
-  if (loading) return <p className="text-center py-6">Loading properties...</p>;
+  if (loading) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        className="w-14 h-14 border-4 border-[#D7B56D] border-t-transparent rounded-full"
+      ></motion.div>
+
+      <p className="mt-6 text-lg font-semibold text-gray-700">
+        Loading <span className="text-[#B28C3F]">Your Listed Properties</span>...
+      </p>
+
+      <p className="text-sm text-gray-500 mt-2">
+        Please wait while we fetch your properties.
+      </p>
+    </div>
+  );
+}
+
 
   const handleDeleteProperty = async () => {
     if (!propertyToDelete) return;
@@ -419,44 +447,32 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
   };
 
   // New dedicated function to wrap the existing removal logic
- const handleRemoveTenantClick = (propertyId, tenant) => {
-  if (tenant) {
-    setPendingRemoval({ propertyId, tenant });
-    setShowConfirmRemoveModal(true);
-  } else {
-    toast.warn("No tenant is currently assigned to remove.");
-  }
-};
+  const handleRemoveTenantClick = (propertyId, tenant) => {
+    if (tenant) {
+      setPendingRemoval({ propertyId, tenant });
+      setShowConfirmRemoveModal(true);
+    } else {
+      toast.warn("No tenant is currently assigned to remove.");
+    }
+  };
 
 
-
-
+  const handleEditProperty = (propertyId) => {
+    navigate(`/dashboard-owner/add-property/${propertyId}`);
+  };
   return (
     <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl">
       {/* Tabs + Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         {/* Tabs */}
-        <div className="flex p-1 border border-[#033E4A33] shadow rounded-xl overflow-hidden w-full sm:w-fit">
-
-          <button
-            onClick={() => setActiveTab("AsTenant")}
-            className={`px-4 md:px-16 py-2 rounded-xl font-medium transition ${activeTab === "AsTenant"
-              ? "bg-[#B28C3F] text-white"
-              : "bg-white text-gray-700"
-              }`}
-          >
-            Current Tenants
-          </button>
-          <button
-            onClick={() => setActiveTab("MyProperty")}
-            className={`px-4 md:px-16 py-2 rounded-xl font-medium transition ${activeTab === "MyProperty"
-              ? "bg-[#B28C3F] text-white"
-              : "bg-white text-gray-700"
-              }`}
-          >
-            My Property
-          </button>
-        </div>
+       <div>
+  <h2 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#B28C3F] to-[#D7B56D] tracking-wide">
+    My Listed Properties
+  </h2>
+  <p className="text-gray-600 text-sm md:text-base mt-1">
+     View, edit, and manage all the properties you’ve listed for rent.
+  </p>
+</div>
 
         {/* Search Button + Bar */}
         <div className="relative flex items-center justify-end w-full sm:w-auto">
@@ -490,7 +506,7 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
       </div>
 
       {/* MyProperty Tab */}
-      {activeTab === "MyProperty" && (
+     
         <div className="space-y-6">
           {properties.length === 0 ? (
             <p className="text-center text-gray-500 py-6">
@@ -525,7 +541,7 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
 
                 <div className="flex flex-wrap gap-3 text-gray-800 text-md">
                   <span><span className="font-bold">Type:</span> {property.type.charAt(0).toUpperCase() + property.type.slice(1)}</span>
-                  <span><span className="font-bold">Size:</span> {property.size} (sqm)</span>
+                  <span><span className="font-bold">Size:</span> {property.sizeV2}</span>
                   <span>
                     <span className="font-bold">Price:</span> ₹
                     {Number(property.price).toLocaleString("en-IN")}
@@ -576,7 +592,7 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
                 <div className="mt-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
                   {/* Tenant Selection */}
-                  <div>
+                  {/* <div>
                     <label className="text-md font-bold text-gray-800">
                       Assign Tenant:
                     </label>
@@ -584,37 +600,42 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
                       className="ml-2 border border-gray-300 rounded-lg px-3 py-1.5 text-md"
                       onChange={(e) => {
                         if (e.target.value === "remove") {
-                           handleRemoveTenantClick(property.id, property.tenants[0])
+                          handleRemoveTenantClick(property.id, property.tenants[0])
                         } else {
                           handleAssignTenant(property.id, e.target.value);
                         }
                       }}
-                      value={property.tenants[0]?.tenantId || ""} // preselect assigned tenant
+                      value={property.tenants[0]?.tenantId || ""} 
                     >
-                      {/* If no tenant is assigned */}
+                    
                       {!property.tenants[0] && <option value="">-- Select Tenant --</option>}
 
-                      {/* If tenant is assigned, show them */}
                       {property.tenants[0] && (
                         <option value={property.tenants[0].tenantId}>
                           {property.tenants[0].fullName || property.tenants[0].tenantId}
                         </option>
                       )}
 
-                      {/* Interested tenants list */}
                       {property.tenantsInterests.length === 0 ? (
                         <option disabled>No interests yet</option>
                       ) : (
                         property.tenantsInterests
-                          .filter((tenant) => tenant.tenantId !== property.tenants[0]?.tenantId) // avoid duplicate
-                          .map((tenant) => (
-                            <option key={tenant.interestId} value={tenant.tenantId}>
-                              {tenant.fullName || tenant.tenantId}
+                          .filter(
+                            (interest) => interest.tenant?.userId !== property.tenants[0]?.userId
+                          )
+                          .map((interest) => (
+
+                            <option
+                              key={interest.interestId}
+                              value={interest.tenant?.userId}
+                            >
+                              {interest.tenant?.fullName || interest.tenant?.userId}
                             </option>
                           ))
+
                       )}
 
-                      {/* Remove tenant option (only if tenant is assigned) */}
+                   
                       {property.tenants[0] && (
                         <option value="remove" className="text-red-500">
                           Remove Tenant
@@ -623,7 +644,44 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
                     </select>
 
 
-                  </div>
+                  </div> */}
+                  {/* Tenant List (Clickable) */}
+{/* Tenant Selection (Dropdown triggers tenancy modal) */}
+<div>
+  <label className="text-md font-bold text-gray-800">Assign Tenant:</label>
+  <select
+    className="ml-2 border border-gray-300 rounded-lg px-3 py-1.5 text-md"
+    onChange={(e) => {
+      const tenantId = e.target.value;
+      if (tenantId && tenantId !== "none") {
+        const selectedTenant = property.tenantsInterests?.find(
+          (t) => t.tenant?.userId === tenantId
+        )?.tenant;
+        if (selectedTenant) {
+          setSelectedTenantForTenancy(selectedTenant);
+          setSelectedPropertyForTenancy(property);
+          setShowStartTenancyModal(true);
+        }
+      }
+    }}
+    defaultValue="none"
+  >
+    <option value="none" disabled>
+      Select Tenant
+    </option>
+    {property.tenantsInterests?.length > 0 ? (
+      property.tenantsInterests.map((interest) => (
+        <option key={interest.interestId} value={interest.tenant?.userId}>
+          {interest.tenant?.fullName || interest.tenant?.userId}
+        </option>
+      ))
+    ) : (
+      <option disabled>No interested tenants</option>
+    )}
+  </select>
+</div>
+
+
 
 
 
@@ -645,9 +703,25 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
 
               {/* Action Buttons */}
               <div className="flex gap-2 mt-3 md:mt-0 md:absolute md:top-5 md:right-5">
-                <button className="p-2 rounded-lg bg-[#033E4A] text-white hover:bg-teal-800 shadow">
+                <button onClick={() => handleEditProperty(property.id)} className="p-2 rounded-lg bg-[#033E4A] text-white hover:bg-teal-800 shadow">
                   <FaEdit size={16} />
                 </button>
+                {/* {property.tenantsInterests?.length > 0 && (
+  <button
+    onClick={() => {
+      const tenant = property.tenantsInterests[0]?.tenant?.userId
+        ? property.tenantsInterests[0]?.tenant
+        : null;
+      setSelectedTenantForTenancy(tenant);
+      setSelectedPropertyForTenancy(property);
+      setShowStartTenancyModal(true);
+    }}
+    className="p-2 rounded-lg bg-[#B28C3F] text-white hover:bg-[#D7B56D] shadow"
+  >
+    Start Tenancy
+  </button>
+)} */}
+
                 <button
                   onClick={() => {
                     setPropertyToDelete(property.id);
@@ -689,221 +763,167 @@ const [pendingRemoval, setPendingRemoval] = useState(null);
 
         </div>
 
-
-      )}
-
-      {/* AsTenant Tab */}
-      {activeTab === "AsTenant" && (
-        <div className="space-y-6">
-          {properties.filter((property) => property.tenants && property.tenants.length > 0).length === 0 ? (
-            <p className="text-center text-gray-500 py-6 text-base font-medium">
-              No tenants assigned to your properties yet.
+      {showConfirmRemoveModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-96 text-center">
+            <h2 className="text-lg font-bold text-gray-800">Confirm Removal</h2>
+            <p className="text-gray-600 mt-2">
+              Are you sure you want to remove{" "}
+              <span className="font-semibold text-[#B28C3F]">
+                {pendingRemoval?.tenant?.fullName || "this tenant"}
+              </span>
+              ?
             </p>
-          ) : (
-            properties
-              .filter((property) => property.tenants && property.tenants.length > 0)
-              .map((property) => (
-                <div
-                  key={property.id}
-                  className="bg-white shadow-lg border border-gray-200 rounded-xl p-6 flex flex-col md:flex-row gap-6 hover:shadow-xl transition-shadow duration-300"
-                >
-                  {/* Tenant Info */}
-                  <div className="w-full md:w-80 flex flex-col items-center md:items-start md:pl-4 bg-gradient-to-b from-gray-50 to-white rounded-xl p-4 shadow-inner">
-                    <div className="relative">
-                      <img
-                        src={
-                          property.tenants[0].profilePicture ||
-                          "https://via.placeholder.com/100?text=Tenant"
-                        }
-                        alt="Tenant"
-                        className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md"
-                      />
-                      <span className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></span>
-                    </div>
 
-                    <div className="mt-4 text-center md:text-left w-full">
-                      <p className="text-base font-semibold text-gray-900">
-                        {property.tenants[0].fullName}
-                      </p>
-                      <p className="text-[12px] text-gray-500">Property Tenant</p>
-
-                      {property.tenants[0].mobileNumber && (
-                        <p className="text-sm mt-3 text-gray-700 flex items-center gap-2">
-                          <span className="font-medium text-md text-gray-900"><FaPhone /></span>
-                          {property.tenants[0].mobileNumber}
-                        </p>
-                      )}
-
-                      {property.tenants[0].email && (
-                        <p className="text-sm mt-2 text-gray-700 flex items-center gap-2">
-                          <span className="font-medium text-md text-gray-900"><MdEmail /></span>
-                          {property.tenants[0].email}
-                        </p>
-                      )}
-
-                      {/* --- REMOVE TENANT BUTTON ADDED HERE --- */}
-                      <button
-                        onClick={() => handleRemoveTenantClick(property.id, property.tenants[0])}
-                        className="mt-6 w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out"
-                      >
-                        Remove Tenant
-                      </button>
-                      {/* ------------------------------------- */}
-                    </div>
-                  </div>
-
-                  {/* Property Info (unchanged) */}
-                  <div className="flex-1 max-w-fit">
-                    <h2 className="text-lg font-semibold">{property.title}</h2>
-
-                    <div className="relative mt-2">
-                      <img
-                        src={property.image}
-                        alt="Property"
-                        className="w-full md:w-100 h-52 object-cover rounded-md"
-                      />
-                      <span className="absolute bottom-2 left-2 bg-black text-white text-sm px-2 py-1 rounded-md">
-                        {property.totalImages}+
-                      </span>
-                    </div>
-
-                    {/* Details */}
-                    <div className="flex flex-col mt-4 gap-2">
-                      <p className="text-sm text-[#24292E]">
-                        <span className="font-semibold text-[#171717]">Address: </span>
-                        {property.address}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-semibold text-[#171717]">Status: </span>
-                        <span className="text-green-600 rounded-xl py-1 px-2 bg-[#34C7591F] font-medium capitalize">
-                          {property.status}
-                        </span>
-                      </p>
-                      <p className="text-sm text-[#24292E]">
-                        <span className="font-semibold text-[#171717]">Type: </span>
-                        {property.type.charAt(0).toUpperCase() + property.type.slice(1)} &nbsp;
-                        <span className="font-semibold text-[#171717]">Size: </span>
-                        {property.size} &nbsp;
-                        <span className="font-semibold text-[#171717]">Price: </span>
-                        ₹{Number(property.price).toLocaleString("en-IN")}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-semibold text-[#171717]">About Place: </span>
-                        {property.aboutPlace}
-                      </p>
-                      <p className="text-sm w-full md:w-[80%] text-[#24292E]">
-                        <span className="font-semibold text-[#171717]">Description: </span>
-                        {property.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="w-full md:w-[30%] pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-gray-200 md:pl-6">
-                    <h3 className="text-base font-bold text-gray-700 mb-3">Previous Tenants</h3>
-
-                    {/* --- STATIC LIST REPLACING DYNAMIC DATA --- */}
-                    <div className="space-y-3 max-h-52 overflow-y-auto pr-2">
-                      {/* Static Previous Tenant 1 */}
-                      <div key="prev-1" className="flex items-center space-x-3 bg-gray-50 p-2 rounded-md border border-gray-100">
-                        <img
-                          src={"https://via.placeholder.com/32?text=S1"} // Static image placeholder
-                          alt="Previous Tenant"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div className="text-sm">
-                          <p className="font-medium text-gray-800 leading-none">Aisha Sharma</p>
-                          <p className="text-xs mt-1 text-gray-500">Stay Duration : 01/02/2023 - 01/06/2023</p>
-                        </div>
-                      </div>
-
-                      {/* Static Previous Tenant 2 */}
-                      <div key="prev-2" className="flex items-center space-x-3 bg-gray-50 p-2 rounded-md border border-gray-100">
-                        <img
-                          src={"https://via.placeholder.com/32?text=S2"} // Static image placeholder
-                          alt="Previous Tenant"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div className="text-sm">
-                          <p className="font-medium text-gray-800 leading-none">Ravi Kapoor</p>
-                          <p className="text-xs mt-1 text-gray-500">Stay Duration : 01/02/2023 - 01/06/2023</p>
-                        </div>
-                      </div>
-
-                      {/* Static Previous Tenant 3 (Optional) */}
-                      <div key="prev-3" className="flex items-center space-x-3 bg-gray-50 p-2 rounded-md border border-gray-100">
-                        <img
-                          src={"https://via.placeholder.com/32?text=S3"} // Static image placeholder
-                          alt="Previous Tenant"
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <div className="text-sm">
-                          <p className="font-medium text-gray-800 leading-none">Priya Singh</p>
-                          <p className="text-xs mt-1 text-gray-500">Stay Duration : 01/02/2023 - 01/06/2023</p>
-                        </div>
-                      </div>
-                    </div>
-                    {/* -------------------------------------------------- */}
-
-                    {/* Removed the conditional check and "No record" message as it's now always populated */}
-                  </div>
-
-                </div>
-              ))
-          )}
+            <div className="mt-6 flex justify-center gap-4">
+              <button
+                onClick={() => setShowConfirmRemoveModal(false)}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowConfirmRemoveModal(false);
+                  // open rating modal next
+                  setTenantToRate(pendingRemoval.tenant);
+                  const property = properties.find(
+                    (p) => p.id === pendingRemoval.propertyId
+                  );
+                  setPropertyForRating(property);
+                  setShowRatingModal(true);
+                }}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+              >
+                Yes, Remove
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
-      {showConfirmRemoveModal && (
+     {showStartTenancyModal && selectedTenantForTenancy && selectedPropertyForTenancy && (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-xl shadow-lg w-96 text-center">
-      <h2 className="text-lg font-bold text-gray-800">Confirm Removal</h2>
-      <p className="text-gray-600 mt-2">
-        Are you sure you want to remove{" "}
-        <span className="font-semibold text-[#B28C3F]">
-          {pendingRemoval?.tenant?.fullName || "this tenant"}
-        </span>
-        ?
-      </p>
+    <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+      <h2 className="text-xl font-bold text-gray-800 mb-4">Start Tenancy</h2>
 
-      <div className="mt-6 flex justify-center gap-4">
-        <button
-          onClick={() => setShowConfirmRemoveModal(false)}
-          className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={() => {
-            setShowConfirmRemoveModal(false);
-            // open rating modal next
-            setTenantToRate(pendingRemoval.tenant);
-            const property = properties.find(
-              (p) => p.id === pendingRemoval.propertyId
-            );
-            setPropertyForRating(property);
-            setShowRatingModal(true);
-          }}
-          className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
-        >
-          Yes, Remove
-        </button>
-      </div>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+
+          const tenancyPayload = {
+            propertyId: selectedPropertyForTenancy.id,
+            tenantUserId: selectedTenantForTenancy.userId,
+            startDate: formData.get("startDate"),
+            endDate: formData.get("endDate"),
+            donePrice: formData.get("rent"),
+            securityDeposit: formData.get("securityDeposit"),
+          };
+
+          try {
+            toast.info("Sending tenancy approval...");
+
+            const res = await ownerApi.submitFormStartTenancyFromOwner(tenancyPayload);
+
+            if (res?.status === 200 || res?.status === "success") {
+              toast.success("Tenancy approval sent successfully!");
+              setShowStartTenancyModal(false);
+            } else {
+              toast.error(res?.data?.message || "Failed to send approval");
+            }
+          } catch (err) {
+            console.error("Error submitting tenancy:", err);
+            toast.error("Something went wrong while starting tenancy");
+          }
+        }}
+        className="space-y-4"
+      >
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Tenant Name</label>
+          <input
+            type="text"
+            value={selectedTenantForTenancy.fullName}
+            readOnly
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Start Date</label>
+          <input
+            type="date"
+            name="startDate"
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">End Date</label>
+          <input
+            type="date"
+            name="endDate"
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Rent Amount (₹)</label>
+          <input
+            type="number"
+            name="rent"
+            required
+            min="0"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Security Deposit (₹)</label>
+          <input
+            type="number"
+            name="securityDeposit"
+            min="0"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        <div className="flex justify-end gap-3 pt-4">
+          <button
+            type="button"
+            onClick={() => setShowStartTenancyModal(false)}
+            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            className="px-4 py-2 rounded-lg bg-[#B28C3F] text-white hover:bg-[#D7B56D] transition shadow-md"
+          >
+            Send Approval
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 )}
 
 
+
       <AnimatePresence>
-            {showRatingModal && (
-                <TenantRatingModal
-                    isOpen={showRatingModal}
-                    onClose={() => setShowRatingModal(false)}
-                    onRateAndRemove={handleRateAndRemoveTenant}
-                    tenant={tenantToRate}
-                    property={propertyForRating}
-                />
-            )}
-        </AnimatePresence>
+        {showRatingModal && (
+          <TenantRatingModal
+            isOpen={showRatingModal}
+            onClose={() => setShowRatingModal(false)}
+            onRateAndRemove={handleRateAndRemoveTenant}
+            tenant={tenantToRate}
+            property={propertyForRating}
+          />
+        )}
+      </AnimatePresence>
 
     </div>
   );

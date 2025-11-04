@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, } from "react";
 import { IoHome, IoSearch } from "react-icons/io5";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { MapPinIcon, MagnifyingGlassIcon, FunnelIcon, XMarkIcon, HomeIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
-import { FaHeart, FaLandmark, FaShareAlt, FaStar } from 'react-icons/fa';
+import { FaHeart, FaLandmark, FaShareAlt, FaStar, FaRegHeart } from 'react-icons/fa';
 import { Range } from "react-range";
 import { FiUser } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,8 +16,11 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import PropertyApi from "../../apis/property/property.api";
+import TenantApi from "../../apis/tenant/tenant.api";
+
 
 const propertyApi = new PropertyApi();
+const tenantApi = new TenantApi();
 
 
 const peopleData = [
@@ -83,199 +86,13 @@ const peopleData = [
   },
 ];
 
-
-const properties = [
-  {
-    id: 1,
-    img: [home1, home2, home3],
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 2,
-    img: [home2, home1, home3],
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 3,
-    img: [home3, home2, home1],
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 4,
-    img: [home1, home2, home3],
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 5,
-    img: [home2, home1, home3],
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 6,
-    img: [home3, home2, home3],
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 7,
-    img: [home3, home2, home3],
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 8,
-    img: [home2, home2, home3],
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 9,
-    img: [home1, home2, home3],
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-];
-
-const propertiesWithMap = [
-  {
-    id: 1,
-    img: home1,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 2,
-    img: home2,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 3,
-    img: home3,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 4,
-    img: home1,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 5,
-    img: home2,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 6,
-    img: home3,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 7,
-    img: home3,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 8,
-    img: home2,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 9,
-    img: home1,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-];
-
-
 const PropertyCard = ({ property }) => {
   const [currentImage, setCurrentImage] = useState(0);
   const [hovering, setHovering] = useState(false);
   const intervalRef = useRef(null);
   const navigate = useNavigate();
+  const [isSaved, setIsSaved] = useState(property.isSaved || false);
+
 
   const { reanent_user_info, reanent_auth_token } = useSelector(
     (state) => state.user
@@ -307,6 +124,34 @@ const PropertyCard = ({ property }) => {
     }
   };
 
+  const handleSaveToggle = async (e) => {
+    e.stopPropagation(); // prevent navigating to property details when heart is clicked
+
+    if (!isLoggedIn) {
+      toast.warn("Please login to save properties.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      if (isSaved) {
+        // Unsave Property
+        await tenantApi.unsaveProperty(property.id);
+        setIsSaved(false);
+        toast.success("Property removed from saved list.");
+      } else {
+        // Save Property
+        await tenantApi.saveProperty(property.id);
+        setIsSaved(true);
+        toast.success("Property saved successfully!");
+      }
+    } catch (error) {
+      console.error("Error saving/unsaving property:", error);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
+
   return (
     <div
       onClick={handleClick}
@@ -330,18 +175,29 @@ const PropertyCard = ({ property }) => {
           <h3 className="text-lg font-semibold">{property.price}/month</h3>
           <div className="flex gap-4 text-gray-500">
             <FaShareAlt className="cursor-pointer hover:text-[#033E4A]" />
-            <FaHeart className="cursor-pointer hover:text-red-500" />
+            {isSaved ? (
+              <FaHeart
+                className="cursor-pointer text-red-500 hover:scale-110 transition-transform"
+                onClick={handleSaveToggle}
+              />
+            ) : (
+              <FaRegHeart
+                className="cursor-pointer text-gray-500 hover:text-red-500 hover:scale-110 transition-transform"
+                onClick={handleSaveToggle}
+              />
+            )}
+
           </div>
         </div>
         <div className="flex items-center gap-2 text-[14px] text-[#383F45] mt-2">
-          <span>{property.beds}</span>
+          <span>{property.beds} Bed rooms</span>
           <span className="text-[#D7B56D] text-lg">•</span>
           <span>{property.baths}</span>
           <span className="text-[#D7B56D] text-lg">•</span>
           <span>{property.area}</span>
         </div>
         <p className="text-[#404040] font-[500] text-[14px] mt-3">
-          {property.location}
+          {property.city}, {property.location}
         </p>
       </div>
     </div>
@@ -418,27 +274,28 @@ const DashboardSearchPage = () => {
 
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);   
-  const [limit, setLimit] = useState(9); 
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(9);
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
         setLoading(true);
         const res = await propertyApi.searchProperties({ page, limit });
-         console.log(res);
+        console.log(res);
         if (res?.status === "success") {
           // normalize API response to match your PropertyCard structure
           const formatted = res.data.map((prop) => ({
             id: prop.property_id,
+            city: prop.city,
             location: prop.location,
             price: `₹${prop.rent.toLocaleString()}`,
             img: prop.images || [],
             tag: prop.status,
-            beds: prop.beds || "N/A",
-            baths: prop.baths || "N/A",
-            area: prop.area || "N/A",
-            
+            beds: prop.bed_rooms || "0",
+            baths: prop.sizeV2 || "0",
+            area: prop.type || "N/A",
+
           }));
           setProperties(formatted);
         }
@@ -452,7 +309,7 @@ const DashboardSearchPage = () => {
     fetchProperties();
   }, [page, limit]); // re-run when page or limit changes
 
-  
+
   return (
     <>
       <section className="bg-white p-4 sm:p-6 md:p-8 lg:px-14 rounded-2xl">
@@ -517,28 +374,7 @@ const DashboardSearchPage = () => {
                   <FunnelIcon className="h-5 w-5 text-gray-600" />
                 </button>
 
-                {/* With Map Button */}
-                <div className="inline-flex rounded-lg border-2 border-[#E5E7EA] overflow-hidden">
-                  <button
-                    onClick={() => setSelected("withMap")}
-                    className={`px-5 py-1.5 m-0.5 text-sm font-medium ${selected === "withMap"
-                      ? "bg-[#F6F7F9] text-black border-2 rounded-lg border-[#24292E]"
-                      : "bg-white text-gray-600"
-                      }`}
-                  >
-                    With Map
-                  </button>
 
-                  <button
-                    onClick={() => setSelected("list")}
-                    className={`px-5 py-1.5 m-0.5 text-sm font-medium ${selected === "list"
-                      ? "bg-[#F6F7F9] text-black border-2 rounded-lg border-[#24292E] "
-                      : "bg-white text-gray-600"
-                      }`}
-                  >
-                    List
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -730,90 +566,41 @@ const DashboardSearchPage = () => {
             <section className="px-4 py-5">
               {(selected === "list") ? (
                 // ✅ List View (your existing grid)
-               <>
-               {loading ? (
-    <p className="text-center text-gray-500">Loading properties...</p>
-  ) : properties.length > 0 ? (
-    <>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-      {properties.map((property) => (
-        <PropertyCard key={property.id} property={property} />
-      ))}
-    </div>
+                <>
+                  {loading ? (
+                    <p className="text-center text-gray-500">Loading properties...</p>
+                  ) : properties.length > 0 ? (
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                        {properties.map((property) => (
+                          <PropertyCard key={property.id} property={property} />
+                        ))}
+                      </div>
 
-    <div className="flex justify-center mt-6 space-x-4">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => setPage((p) => p + 1)}
-          className="px-4 py-2 bg-gray-200 rounded"
-        >
-          Next
-        </button>
-      </div>
-</>
-    
-  ) : (
-    <p className="text-center text-gray-500">No properties found</p>
-  )}
-               </>
-
-              ) : (
-                (selected === "withMap") ? (
-                  // ✅ With Map View
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
-                    {/* Left: Property Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto pr-4">
-                      {propertiesWithMap.map((property) => (
-                        <div
-                          key={property.id}
-                          className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl hover:scale-102 transition-all duration-300 ease-in-out "
+                      <div className="flex justify-center mt-6 space-x-4">
+                        <button
+                          disabled={page === 1}
+                          onClick={() => setPage((p) => p - 1)}
+                          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                         >
-                          <div className="relative">
-                            <img
-                              src={property.img}
-                              alt={property.location}
-                              className="w-full h-56 object-cover"
-                            />
-                            <span className="absolute top-4 left-0 bg-[#033E4A] text-white px-3 py-1 rounded-r-md text-sm font-medium">
-                              {property.tag}
-                            </span>
-                          </div>
-                          <div className="p-4">
-                            <div className='flex justify-between items-center '>
-                              <h3 className="text-lg font-semibold">{property.price}</h3>
-                              <div className="flex gap-4 text-gray-500">
-                                <FaShareAlt className="cursor-pointer hover:text-[#033E4A]" />
-                                <FaHeart className="cursor-pointer hover:text-red-500" />
-                              </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mt-1">{property.beds} • {property.baths} • {property.area}</p>
-                            <p className="text-gray-700 text-sm mt-2">{property.location}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                          Previous
+                        </button>
+                        <button
+                          onClick={() => setPage((p) => p + 1)}
+                          className="px-4 py-2 bg-gray-200 rounded"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </>
 
-                    {/* Right: Map Placeholder */}
-                    <div className="w-full h-[80vh] rounded-2xl shadow-lg">
-                      <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14717.09614890894!2d75.88652044994416!3d22.755209269789884!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396302af403406fb%3A0x5b50834b117f8bab!2sVijay%20Nagar%2C%20Scheme%20No%2054%2C%20Indore%2C%20Madhya%20Pradesh%20452010!5e0!3m2!1sen!2sin!4v1755768503769!5m2!1sen!2sin"
-                        width="100%"
-                        height="100%"
-                        className="rounded-2xl border-0"
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                      />
+                  ) : (
+                    <p className="text-center text-gray-500">No properties found</p>
+                  )}
+                </>
 
-                    </div>
-                  </div>
-                ) : (<></>))}
+              ) : (<></>
+              )}
             </section>
           </>}
         {activeTab === "People" &&
@@ -879,8 +666,8 @@ const DashboardSearchPage = () => {
                             <FaStar
                               key={i}
                               className={`${i < Math.floor(person.rating)
-                                  ? "text-yellow-500"
-                                  : "text-gray-300"
+                                ? "text-yellow-500"
+                                : "text-gray-300"
                                 } w-4 h-4`}
                             />
                           ))}

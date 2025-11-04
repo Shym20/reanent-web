@@ -34,7 +34,7 @@ const tenantInterests = [
     message: "I really liked the property details. Can we schedule a visit?",
     status: "Accepted",
   },
-    {
+  {
     id: 3,
     property: {
       title: "Luxury Studio Flat",
@@ -49,7 +49,7 @@ const tenantInterests = [
     message: "I really liked the property details. Can we schedule a visit?",
     status: "Declined",
   },
-    {
+  {
     id: 4,
     property: {
       title: "Luxury Studio Flat",
@@ -67,38 +67,55 @@ const tenantInterests = [
 ];
 
 export default function DashboardMyInterest() {
-  // const [interests, setInterests] = useState([]);
-  // const [loading, setLoading] = useState(true);
+  const [interests, setInterests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // const fetchInterests = async () => {
-  //   try {
-  //     const tenantApi = new TenantApi();
-  //     const response = await tenantApi.getAllInterests();
-  //     console.log("Fetched interests:", response.data);
+  const fetchInterests = async () => {
+    try {
+      const tenantApi = new TenantApi();
+      const response = await tenantApi.getAllInterests();
+      console.log("Fetched interests:", response.data);
 
-  //     if (response?.data?.data) {
-  //       setInterests(response.data.data);
-  //     } else {
-  //       setInterests([]);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching interests:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+      if (response?.data) {
+        console.log("hehe prop int :", response.data);
+        setInterests(response.data);
+      } else {
+        setInterests([]);
+      }
+    } catch (error) {
+      console.error("Error fetching interests:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // useEffect(() => {
-  //   fetchInterests();
-  // }, []);
+  useEffect(() => {
+    fetchInterests();
+  }, []);
 
-  // if (loading) {
-  //   return <p className="text-center text-gray-500 py-6">Loading your interests...</p>;
-  // }
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          className="w-14 h-14 border-4 border-[#033E4A] border-t-transparent rounded-full"
+        ></motion.div>
+  
+        <p className="mt-6 text-lg font-semibold text-gray-700">
+          Loading <span className="text-[#033E4A]">Your Interests</span>...
+        </p>
+  
+        <p className="text-sm text-gray-500 mt-2">
+          Please wait while we fetch your interests.
+        </p>
+      </div>
+    );
+  }
 
-  // if (interests.length === 0) {
-  //   return <p className="text-center text-gray-500 py-6">No interests found.</p>;
-  // }
+  if (interests.length === 0) {
+    return <p className="text-center text-gray-500 py-6">No interests found.</p>;
+  }
   return (
     <div className="p-6 space-y-6">
       <motion.h2
@@ -111,7 +128,7 @@ export default function DashboardMyInterest() {
       </motion.h2>
 
       <div className="grid gap-6 md:grid-cols-3">
-        {tenantInterests.map((interest, idx) => (
+        {interests.map((interest, idx) => (
           <motion.div
             key={interest.id}
             initial={{ opacity: 0, y: 30 }}
@@ -122,18 +139,17 @@ export default function DashboardMyInterest() {
             {/* Property Image */}
             <div className="relative">
               <img
-                src={interest.property.image}
+                src={interest.property.images[0]}
                 alt={interest.property.title}
                 className="w-full h-48 object-cover"
               />
               <span
-                className={`absolute top-3 left-3 text-xs px-3 py-1 rounded-full shadow text-white ${
-                  interest.status === "Accepted"
+                className={`absolute top-3 left-3 text-xs px-3 py-1 rounded-full shadow text-white ${interest.status === "accepted"
                     ? "bg-green-600"
-                    : interest.status === "Declined"
-                    ? "bg-red-500"
-                    : "bg-yellow-500"
-                }`}
+                    : interest.status === "declined"
+                      ? "bg-red-500"
+                      : "bg-yellow-500"
+                  }`}
               >
                 {interest.status}
               </span>
@@ -142,42 +158,43 @@ export default function DashboardMyInterest() {
             {/* Content */}
             <div className="p-5 space-y-4">
               {/* Property Info */}
-             <div className="flex justify-between ">
-                 <div>
-                <h3 className="text-lg font-semibold text-[#033E4A] flex items-center gap-2">
-                  <FiHome /> {interest.property.title}
-                </h3>
-                <p className="text-sm text-gray-600 flex items-center gap-2">
-                  <FiMapPin /> {interest.property.address}
-                </p>
+              <div className="flex justify-between ">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#033E4A] flex items-center gap-2">
+                    <FiHome /> {interest.property.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 flex items-center gap-2">
+                    <FiMapPin /> {interest.property.city}, {interest.property.location}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-[#033E4A] flex items-center gap-2">
+                    ₹{Number(interest.property.rent).toLocaleString('en-IN')}
+                  </h3>
+
+
+                </div>
               </div>
-               <div>
-                <h3 className="text-xl font-semibold text-[#033E4A] flex items-center gap-2">
-                  ₹15,000
-                </h3>
-               
-              </div>
-             </div>
 
               {/* Tenant Message */}
               <p className="text-gray-700 text-sm bg-gray-50 p-3 rounded-xl border-l-4 border-[#033E4A] flex items-start gap-2">
                 <FiMessageSquare className="text-[#033E4A] mt-0.5" />
-                {interest.message}
+                {interest.message || "I'm interested in the property"}
               </p>
 
               {/* Owner Info */}
               <div className="flex items-center gap-4 mt-4">
                 <img
-                  src={interest.owner.avatar}
+                  src={interest.owner.profilePicture}
                   alt={interest.owner.name}
                   className="w-14 h-14 rounded-full object-cover border-2 border-[#033E4A]/30 shadow-md"
                 />
                 <div>
                   <p className="flex items-center gap-2 text-gray-800 font-semibold">
-                    <FiUser className="text-[#033E4A]" /> {interest.owner.name}
+                    <FiUser className="text-[#033E4A]" /> {interest.owner.fullName}
                   </p>
                   <p className="flex items-center gap-2 text-gray-600 text-sm">
-                    <FiPhone className="text-[#033E4A]" /> {interest.owner.phone}
+                    <FiPhone className="text-[#033E4A]" /> {interest.owner.mobileNumber || interest.owner.email}
                   </p>
                 </div>
               </div>

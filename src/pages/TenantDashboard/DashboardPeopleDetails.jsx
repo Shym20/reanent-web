@@ -49,6 +49,33 @@ export default function DashboardPeopleDetails() {
       ownerName: "Neha Sharma",
     },
   ],
+  transactions: [
+  {
+    id: 1,
+    propertyName: "Greenwood Apartments",
+    date: "10 Oct 2025",
+    amount: 15000,
+    status: "Paid",
+    mode: "UPI",
+  },
+  {
+    id: 2,
+    propertyName: "Greenwood Apartments",
+    date: "10 Sep 2025",
+    amount: 15000,
+    status: "Paid",
+    mode: "UPI",
+  },
+  {
+    id: 3,
+    propertyName: "Greenwood Apartments",
+    date: "10 Aug 2025",
+    amount: 15000,
+    status: "Paid",
+    mode: "Cash",
+  },
+],
+
     isOwner: true,
     ownedProperties: [
       {
@@ -272,6 +299,61 @@ export default function DashboardPeopleDetails() {
     )}
   </motion.div>
 )}
+
+{/* Tenant Transactions */}
+{person.transactions?.length > 0 && (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.3, duration: 0.6 }}
+    className="bg-gray-50/80 backdrop-blur-lg rounded-2xl p-6 shadow hover:shadow-xl transition"
+  >
+    <h3 className="text-xl font-semibold text-gray-800 mb-4">
+      Transaction History
+    </h3>
+
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-sm border-collapse">
+        <thead>
+          <tr className="bg-[#033E4A] text-white">
+            <th className="py-3 px-4 text-left rounded-l-xl">Date</th>
+            <th className="py-3 px-4 text-left">Property</th>
+            <th className="py-3 px-4 text-left">Mode</th>
+            <th className="py-3 px-4 text-left">Amount (₹)</th>
+            <th className="py-3 px-4 text-left rounded-r-xl">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {person.transactions.map((txn, idx) => (
+            <tr
+              key={txn.id}
+              className="border-b hover:bg-gray-100 transition"
+            >
+              <td className="py-3 px-4 text-gray-700">{txn.date}</td>
+              <td className="py-3 px-4 text-gray-700">{txn.propertyName}</td>
+              <td className="py-3 px-4 text-gray-700">{txn.mode}</td>
+              <td className="py-3 px-4 font-semibold text-gray-800">
+                ₹{txn.amount.toLocaleString()}
+              </td>
+              <td className="py-3 px-4">
+                <span
+                  className={`px-3 py-1 text-xs rounded-full font-semibold ${
+                    txn.status === "Paid"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {txn.status}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </motion.div>
+)}
+
 
 
         {/* Owned Properties */}

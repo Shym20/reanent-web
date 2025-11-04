@@ -5,6 +5,7 @@ import "react-image-gallery/styles/css/image-gallery.css";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { formatDistanceToNow } from "date-fns";
 
 import house1 from "../../assets/images/home1.png";
 import livingroom from "../../assets/images/home1.png";
@@ -444,20 +445,27 @@ const DashboardPropertyDetail = () => {
   if (!property) return <p>No property found</p>;
 
   const handleSendInterest = async () => {
+    if (!message) {
+      toast.error("Please select a message before sending interest");
+      return;
+    }
+
     try {
       const tenantApi = new TenantApi();
-      const res = await tenantApi.registerInterest(id);
+      const res = await tenantApi.registerInterest(id, message); // ✅ pass message here
 
       if (res?.status === "success") {
-       toast.success("Interest sent successfully")
+        toast.success("Interest sent successfully");
+        setMessage(""); // optional: reset selection
       } else {
         toast.error(res?.data?.message || "Error while registering interest");
       }
     } catch (err) {
-      toast.error(err);
-      
+      console.error("Error sending interest:", err);
+      toast.error("Something went wrong while sending interest");
     }
   };
+
 
   return (
     <>
@@ -472,13 +480,6 @@ const DashboardPropertyDetail = () => {
               <div className="flex justify-between">
                 {/* Header */}
                 <div className="flex items-center gap-4 text-[#262626] text-sm">
-                  <button
-                    onClick={handleSendInterest}
-                    className="bg-[#033E4A] text-white px-4 py-2 rounded-lg text-sm font-medium 
-                 hover:bg-[#022c35] transition"
-                  >
-                    Send Interest
-                  </button>
                   <span
                     className={`px-2 py-0.5 rounded-md text-xs font-medium ${property.status === "rent"
                       ? "bg-green-100 text-green-600"
@@ -488,7 +489,10 @@ const DashboardPropertyDetail = () => {
                     {property.status === "rent" ? "Active" : "Inactive"}
                   </span>
 
-                  <span>Posted 13 hours ago</span>
+                  <span>
+                    Posted{" "}
+                    {formatDistanceToNow(new Date(property?.createdAt), { addSuffix: true })}
+                  </span>
 
                 </div>
 
@@ -526,26 +530,22 @@ const DashboardPropertyDetail = () => {
               {/* Rooms Info */}
               <div className="mt-2 text-sm text-gray-600 flex flex-wrap gap-2">
                 <span className="flex items-center gap-1">
-                  <GoDotFill className="text-xs text-[#D7B56D] " /> 1 Living Room
+                  <GoDotFill className="text-xs text-[#D7B56D] " />  {property?.living_rooms} Living Room
                 </span>
                 <span className="flex items-center gap-1">
-                  <GoDotFill className="text-xs text-[#D7B56D] " /> 1 Kitchen
+                  <GoDotFill className="text-xs text-[#D7B56D] " />  {property?.kitchen} Kitchen
                 </span>
                 <span className="flex items-center gap-1">
-                  <GoDotFill className="text-xs text-[#D7B56D]" /> 2 Bedrooms
+                  <GoDotFill className="text-xs text-[#D7B56D]" />  {property?.bed_rooms} Bedrooms
                 </span>
                 <span className="flex items-center gap-1">
-                  <GoDotFill className="text-xs text-[#D7B56D]" /> 2 Bathrooms
+                  <GoDotFill className="text-xs text-[#D7B56D]" />  {property?.baths} Bathrooms
                 </span>
               </div>
 
               {/* Description */}
               <p className="mt-4 text-[#24292E] text-[16px] leading-relaxed">
-                A spacious 2BHK apartment with excellent ventilation, modern interiors,
-                and semi-furnished fittings including wardrobes and a modular kitchen.
-                The apartment is located in a prime area, close to schools, hospitals,
-                markets, and public transport, making it ideal for families and working
-                professionals.
+                {property?.description}
               </p>
 
               {/* About Place */}
@@ -553,26 +553,26 @@ const DashboardPropertyDetail = () => {
                 <h3 className="font-semibold text-gray-800 mb-3">About Place</h3>
                 <div className="flex flex-wrap gap-3">
                   <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
-                    <FiHome /> 2BHK Apartment
+                    <FiHome />  {property?.type}
                   </span>
                   <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
-                    <FiMaximize /> 950 sq. ft.
+                    <FiMaximize />  {property?.sizeV2}
                   </span>
-                  <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
+                  {/* <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
                     <FiUsers /> Single Family
-                  </span>
+                  </span> */}
                   <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
-                    <LuSofa /> Semi-furnished
+                    <LuSofa />  {property?.condition}
                   </span>
-                  <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
+                  {/* <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
                     <FiWind /> A/C, Heating & Cooling
                   </span>
                   <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
                     <LuCar /> 1 Car Parking
-                  </span>
-                  <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
+                  </span> */}
+                  {/* <span className="px-4 py-2 bg-gray-100 rounded-full flex items-center gap-2 text-sm">
                     <FaWater /> 24x7 Water Supply
-                  </span>
+                  </span> */}
                 </div>
               </div>
             </div>
@@ -595,12 +595,12 @@ const DashboardPropertyDetail = () => {
             {/* Left Profile Card */}
             <div className="flex flex-col items-center bg-white border border-[#E5E7EA] rounded-2xl p-4 w-64">
               <img
-                src="https://i.pravatar.cc/150?img=5"
+                src={property?.owner?.profilePicture}
                 alt="Owner"
                 className="w-32 h-32 rounded-full object-cover mb-4"
               />
               <p className="text-gray-500 text-sm">Owner</p>
-              <h2 className="text-xl font-semibold">Mr. Sharma</h2>
+              <h2 className="text-xl font-semibold"> {property?.owner?.fullName}</h2>
               <div className="flex items-center mt-2 bg-[#D7B56D1F] py-1 px-2 rounded-full ">
                 <span className="text-yellow-500 text-md">★</span>
                 <span className="ml-1 text-gray-700 text-md font-medium">4.6</span>
@@ -611,25 +611,26 @@ const DashboardPropertyDetail = () => {
             <div className="flex-1">
               {/* Buttons */}
               <div className="flex gap-3 mb-5">
-                <button onClick={() => setActiveTab("chat")}
+                {/* <button onClick={() => setActiveTab("chat")}
                   className={`px-4 py-2 rounded-lg font-medium ${activeTab === "chat"
                     ? "bg-[#D7B56D] text-white"
                     : "bg-gray-100 text-gray-700"
                     }`}>
                   Chat with Owner
-                </button>
-                <button onClick={() => setActiveTab("schedule")}
+                </button> */}
+                {/* <button onClick={() => setActiveTab("schedule")}
                   className={`px-4 py-2 rounded-lg font-medium ${activeTab === "schedule"
                     ? "bg-[#D7B56D] text-white"
                     : "bg-gray-100 text-gray-700"
                     }`}>
                   Schedule a Visit
-                </button>
+                </button> */}
+                <h2 className="font-semibold text-xl ">About Owner</h2>
               </div>
 
               {/* Description */}
               <p className="text-[#24292E] text-[16px] mb-4">
-                Mr. Sharma is the owner of this property and manages all details
+                {property?.owner?.fullName} is the owner of this property and manages all details
                 directly. He is known for quick responses and clear communication.
               </p>
 
@@ -638,22 +639,49 @@ const DashboardPropertyDetail = () => {
               {/* Chat Box */}
               {activeTab === "chat" && <>
                 <div>
-                  <label className="block mb-2 font-medium text-[#24292E] ">
-                    Chat with Owner
+                  <label className="block mb-2 font-medium text-[#24292E]">
+                    Select message to send interest
                   </label>
-                  <div className="relative mb-3">
-                    <textarea
-                      rows="3"
-                      placeholder="Write here"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      className="w-full pl-3 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+
+                  <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                    <button
+                      type="button"
+                      onClick={() => setMessage("Hi, I'm interested in this property")}
+                      className={`border px-4 py-2 rounded-lg text-left hover:bg-teal-50 ${message === "Hi, I'm interested in this property"
+                          ? "border-teal-600 bg-teal-100"
+                          : "border-gray-300"
+                        }`}
+                    >
+                      Hi, I'm interested in this property
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setMessage("Hey, I want to schedule a visit for this property")
+                      }
+                      className={`border px-4 py-2 rounded-lg text-left hover:bg-teal-50 ${message === "Hey, I want to schedule a visit for this property"
+                          ? "border-teal-600 bg-teal-100"
+                          : "border-gray-300"
+                        }`}
+                    >
+                      Hey, I want to schedule a visit for this property
+                    </button>
                   </div>
-                  <button className="bg-[#033E4A] text-white px-8 py-2 rounded-lg hover:bg-teal-800">
-                    Message Owner
+
+                  <button
+                    onClick={handleSendInterest}
+                    disabled={!message}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition 
+    ${message
+                        ? "bg-[#033E4A] text-white hover:bg-[#022c35]"
+                        : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      }`}
+                  >
+                    Send Interest
                   </button>
                 </div>
+
               </>}
               {activeTab === "schedule" && <ScheduleVisit />}
             </div>

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import logo from '../assets/images/logo.png'
 import { IoSearch } from "react-icons/io5";
+import { BellIcon } from "lucide-react";
 
 export default function DashNav({ onToggleSidebar, role, setRole, sidebarOpen }) {
   const [showModal, setShowModal] = useState(false);
@@ -63,6 +64,10 @@ export default function DashNav({ onToggleSidebar, role, setRole, sidebarOpen })
             >
               <IoSearch className="text-xl" />
             </NavLink>
+
+             <button onClick={() => navigate("/dashboard-tenant/notifications")} className=" items-center px-1.5 py-1.5 mr-4 rounded-full hover:bg-[#033E4A] hover:text-white text-gray-700">
+                  <BellIcon className="w-full h-full" />
+                </button>
 
           <div className="flex items-center border border-[#033E4A33] shadow rounded-full p-1 gap-2 md:mr-6">
             <Link to={'/dashboard-owner'}>

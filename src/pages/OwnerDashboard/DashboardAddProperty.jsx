@@ -1,9 +1,10 @@
 import { Plus } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import PropertyApi from '../../apis/property/property.api'
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import { getTokenLocal } from "../../utils/localStorage.util";
+import { useParams, useSearchParams } from "react-router-dom";
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const DashboardAddProperty = () => {
@@ -23,6 +24,7 @@ const DashboardAddProperty = () => {
     description: "",
     type: "",
     size: "",
+    unit: "sqm",
     kitchen: 0,
     baths: 0,
     condition: "",
@@ -32,6 +34,58 @@ const DashboardAddProperty = () => {
     images: [],
     imageFiles: [],
   });
+
+  const { id: editId } = useParams();
+  const isEditMode = Boolean(editId);
+
+
+  useEffect(() => {
+    const fetchPropertyDetails = async () => {
+      if (!isEditMode) return;
+
+      try {
+        const propertyApi = new PropertyApi();
+        const res = await propertyApi.getPropertyDetail(editId);
+        if (res?.data) {
+          const p = res.data.propertyDetails;
+
+          console.log("p is here :", p);
+
+          // Prefill form
+          setForm({
+            name: p.name || "",
+            address: p.address || "",
+            state: p.location || "",
+            city: p.city || "",
+            bed_rooms: p.bed_rooms || 0,
+            living_rooms: p.living_rooms || 0,
+            rent: p.rent || "",
+            description: p.description || "",
+            type: p.type || "",
+            size: p.sizeV2?.split(" ")[0] || 0,
+            unit: p.sizeV2?.split(" ")[1] || "sqm",
+            kitchen: p.kitchen || 0,
+            baths: p.baths || 0,
+            condition: p.condition || "",
+            furnishing: p.furnishing || "",
+            status: p.status || "rent",
+            location: p.location || "",
+            images: p.images || [],
+            imageFiles: [],
+          });
+
+          // Set image previews
+          setImagePreviews(p.images || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch property details:", err);
+        toast.error("Failed to load property for editing");
+      }
+    };
+
+    fetchPropertyDetails();
+  }, [isEditMode, editId]);
+
 
 
   const handleChange = (e) => {
@@ -60,21 +114,33 @@ const DashboardAddProperty = () => {
     setForm((p) => ({ ...p, kitchen: val }));
   };
 
-  const handleFilesSelected = (e) => {
+  const handleFilesSelected = async (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
-    const newFiles = [...form.imageFiles, ...files];
-    setForm((p) => ({ ...p, imageFiles: newFiles }));
-
-    // generate previews separately
+    // show previews immediately
     const newPreviews = files.map((file) => URL.createObjectURL(file));
     setImagePreviews((prev) => [...prev, ...newPreviews]);
 
-    e.target.value = "";
+    // 🔹 Upload files to server as soon as selected
+    try {
+      const uploadedUrls = await uploadImagesToServer(files);
+
+      // 🔹 Add URLs directly into form.images
+      setForm((prev) => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls],
+      }));
+
+      toast.success(`${uploadedUrls.length} image(s) uploaded successfully`);
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      toast.error("Failed to upload images");
+    } finally {
+      // clear file input
+      e.target.value = "";
+    }
   };
-
-
 
   const openFilePicker = () => {
     if (fileInputRef.current) fileInputRef.current.click();
@@ -128,10 +194,33 @@ const DashboardAddProperty = () => {
     return uploadedUrls;
   };
 
+  const deleteImageFromServer = async (imageUrl) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/user/s3/delete`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ data: imageUrl }),
+      });
+
+      if (!res.ok) throw new Error("Failed to delete image");
+      const data = await res.json();
+
+      if (data?.code === 201) {
+        toast.success("Image deleted successfully");
+      } else {
+        toast.error("Failed to delete image");
+      }
+    } catch (err) {
+      console.error("Error deleting image:", err);
+      toast.error("Error deleting image");
+    }
+  };
 
 
   const handleSubmit = async () => {
-
     if (submitting) return;
     setSubmitting(true);
 
@@ -141,77 +230,79 @@ const DashboardAddProperty = () => {
         return;
       }
 
-      // upload all selected files and get URLs
-      const uploadedImageUrls = await uploadImagesToServer(form.imageFiles);
 
-      // merge with any existing URLs already in form.images
-      const allImageUrls = [...(form.images || []), ...uploadedImageUrls];
 
-      const normalizeLocation = (city) => {
-        if (!city) return "";
-        return city
-          .split(" ")
-          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-          .join(" ");
-      };
+      const normalizeLocation = (city) =>
+        city ? city.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ") : "";
 
       const payload = {
-        property_id: "PROP-" + Date.now(),
-        owner: "68b945a33f4407e55853a9e9",
         name: form.name,
         state: form.state,
         city: form.city,
-
-        // price: 4500000,
-        size: parseNumber(form.size) || 0,
+        size: form.size,
+        sizeV2: `${form.size} ${form.unit || "sqm"}`,
         kitchen: Number(form.kitchen) || 0,
         condition: form.condition,
         furnishing: form.furnishing,
         address: form.address,
         location: normalizeLocation(form.city),
         type: form.type,
-        rent: parseNumber(form.rent) || 0,
+        rent: Number(form.rent) || 0,
         living_rooms: Number(form.living_rooms) || 0,
         bed_rooms: Number(form.bed_rooms) || 0,
         baths: Number(form.baths) || 0,
         description: form.description,
-        images: allImageUrls,
+        images: form.images,
         status: form.status,
       };
 
       const propertyApi = new PropertyApi();
-      const res = await propertyApi.postProperty(payload);
+      let res;
 
-      if (res?.status === "success" || res?.status === 201 || res?.status === 200) {
-        toast.success("Property posted successfully");
-        setForm({
-          name: "",
-          address: "",
-          state: "",
-          city: "",
-          // price: "",
-          rent: "",
-          description: "",
-          type: "",
-          size: "",
-          kitchen: false,
-          baths: 0,
-          condition: "",
-          furnishing: "",
-          status: "rent",
-          location: "",
-          images: [],
-          imageFiles: [],
-          rooms: "",
-        });
-        setImagePreviews([]);
+      if (isEditMode) {
+        // 🔹 Update API
+        res = await propertyApi.editProperty(editId, payload);
       } else {
-        console.error("postProperty error:", res);
-        toast.error(res?.data?.message || "Failed to post property");
+        // 🔹 Create API
+        res = await propertyApi.postProperty({
+          ...payload,
+          property_id: "PROP-" + Date.now(),
+          owner: "68b945a33f4407e55853a9e9",
+        });
+      }
+
+      if (res?.status === "success" || res?.status === 200 || res?.status === 201) {
+        toast.success(isEditMode ? "Property updated successfully" : "Property added successfully");
+        if (!isEditMode) {
+          // reset only for new property
+          setForm({
+            name: "",
+            address: "",
+            state: "",
+            city: "",
+            rent: "",
+            description: "",
+            type: "",
+            size: "",
+            unit: "",
+            kitchen: 0,
+            baths: 0,
+            condition: "",
+            furnishing: "",
+            status: "rent",
+            location: "",
+            images: [],
+            imageFiles: [],
+            rooms: "",
+          });
+          setImagePreviews([]);
+        }
+      } else {
+        toast.error("Failed to save property");
       }
     } catch (err) {
-      console.error("API error", err);
-      toast.error("Something went wrong while posting property");
+      console.error("Error saving property:", err);
+      toast.error("Something went wrong");
     } finally {
       setSubmitting(false);
     }
@@ -222,7 +313,9 @@ const DashboardAddProperty = () => {
     <>
       <section className="bg-white p-4 sm:p-6 md:p-8 lg:px-24 rounded-2xl">
         <div className="mb-10 mt-4">
-          <h2 className="text-2xl font-bold text-[#24292E]">Fill up the details to Add Property</h2>
+          <h2 className="text-2xl font-bold text-[#24292E]">
+            {isEditMode ? "Edit Property Details" : "Fill up the details to Add Property"}
+          </h2>
         </div>
 
         <div className="flex  flex-col gap-6">
@@ -336,18 +429,28 @@ const DashboardAddProperty = () => {
                   {/* delete button */}
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
+                      const imageUrl = form.images[idx]; // get actual S3 URL
+
+                      // 1️⃣ Delete from server first
+                      if (imageUrl) {
+                        await deleteImageFromServer(imageUrl);
+                      }
+
+                      // 2️⃣ Then update local state
                       const newPreviews = [...imagePreviews];
-                      const newFiles = [...form.imageFiles];
+                      const newImages = [...form.images];
                       newPreviews.splice(idx, 1);
-                      newFiles.splice(idx, 1);
+                      newImages.splice(idx, 1);
+
                       setImagePreviews(newPreviews);
-                      setForm((prev) => ({ ...prev, imageFiles: newFiles }));
+                      setForm((prev) => ({ ...prev, images: newImages }));
                     }}
                     className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-opacity-80"
                   >
                     ×
                   </button>
+
                 </div>
               ))}
 
@@ -433,7 +536,7 @@ const DashboardAddProperty = () => {
           <div>
             <div className="w-full border border-gray-300 rounded-xl p-4">
               <p className="text-black font-bold text-lg mb-3">Property Size</p>
-             
+
 
               <div className="relative mt-2">
                 <input
@@ -587,7 +690,7 @@ const DashboardAddProperty = () => {
               className={`bg-[#033e4a] text-white py-3 px-16 font-semibold rounded-lg ${submitting ? "opacity-50 cursor-not-allowed" : ""
                 }`}
             >
-              {submitting ? "Saving..." : "Save"}
+              {submitting ? "Saving..." : isEditMode ? "Update Property" : "Save"}
             </button>
 
           </div>

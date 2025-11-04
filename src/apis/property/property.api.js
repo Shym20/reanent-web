@@ -34,11 +34,12 @@ class PropertyApi extends HttpClient {
   postPropertyConfig = ApiRoutes.Property.postProperty;
   getMyPropertiesConfig = ApiRoutes.Property.getMyProperties;
   searchPropertiesConfig = ApiRoutes.Property.searchProperties;
-  getPropertyDetailConfig = ApiRoutes.Property.getPropertyDetail; 
+  getPropertyDetailConfig = ApiRoutes.Property.getPropertyDetail;
   getTenantInterestsOfPropertyConfig = ApiRoutes.Property.getTenantInterestsOfProperty;
   associateTenantConfig = ApiRoutes.Property.associateTenant;
   deAssociateTenantConfig = ApiRoutes.Property.deAssociateTenant;
   deletePropertyConfig = ApiRoutes.Property.deleteProperty;
+  editPropertyConfig = ApiRoutes.Property.editProperty;
   togglePropertyVisibiltyConfig = ApiRoutes.Property.togglePropertyVisibility;
 
   postProperty = async (reqBody) => {
@@ -51,81 +52,90 @@ class PropertyApi extends HttpClient {
   };
 
   getMyProperties = async () => {
-   return this.instance({
-     method: this.getMyPropertiesConfig.Method,
-     url: this.getMyPropertiesConfig.Endpoint,
-   });
- };
+    return this.instance({
+      method: this.getMyPropertiesConfig.Method,
+      url: this.getMyPropertiesConfig.Endpoint,
+    });
+  };
 
-//   searchProperties = async ({ page = 1, limit = null }) => {
-//   const queryParams = new URLSearchParams();
-//   queryParams.append("page", page);
-//   if (limit !== null) queryParams.append("limit", limit);
+  //   searchProperties = async ({ page = 1, limit = null }) => {
+  //   const queryParams = new URLSearchParams();
+  //   queryParams.append("page", page);
+  //   if (limit !== null) queryParams.append("limit", limit);
 
-//   return this.instance({
-//     method: this.searchPropertiesConfig.Method,
-//     url: `${this.searchPropertiesConfig.Endpoint}${queryParams.toString()}`,
-//   });
-// };
+  //   return this.instance({
+  //     method: this.searchPropertiesConfig.Method,
+  //     url: `${this.searchPropertiesConfig.Endpoint}${queryParams.toString()}`,
+  //   });
+  // };
 
-searchProperties = async (filters = {}) => {
-  const queryParams = new URLSearchParams();
+  searchProperties = async (filters = {}) => {
+    const queryParams = new URLSearchParams();
 
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value !== null && value !== "" && value !== "Any") {
-      queryParams.append(key, value);
-    }
-  });
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== null && value !== "" && value !== "Any") {
+        queryParams.append(key, value);
+      }
+    });
 
-  return this.instance({
-    method: this.searchPropertiesConfig.Method,
-    url: `${this.searchPropertiesConfig.Endpoint}${queryParams.toString()}`,
-  });
-};
+    return this.instance({
+      method: this.searchPropertiesConfig.Method,
+      url: `${this.searchPropertiesConfig.Endpoint}${queryParams.toString()}`,
+    });
+  };
 
-getPropertyDetail = async (propertyId) => {
-  return this.instance({
-    method: this.getPropertyDetailConfig.Method,
-    url: `${this.getPropertyDetailConfig.Endpoint}/${propertyId}`,
-  });
-};
+  getPropertyDetail = async (propertyId) => {
+    return this.instance({
+      method: this.getPropertyDetailConfig.Method,
+      url: `${this.getPropertyDetailConfig.Endpoint}/${propertyId}`,
+    });
+  };
 
-getTenantInterestsOfProperty = async (propertyId) => {
-  return this.instance({
-    method: this.getTenantInterestsOfPropertyConfig.Method,
-    url: `${this.getTenantInterestsOfPropertyConfig.Endpoint}/${propertyId}`,
-  });
-};
+  getTenantInterestsOfProperty = async (propertyId) => {
+    return this.instance({
+      method: this.getTenantInterestsOfPropertyConfig.Method,
+      url: `${this.getTenantInterestsOfPropertyConfig.Endpoint}/${propertyId}`,
+    });
+  };
 
-associateTenant = async (payload) => {
-  return this.instance({
-    method: this.associateTenantConfig.Method,
-    url: this.associateTenantConfig.Endpoint,
-    data: payload,
-  });
-};
+  associateTenant = async (payload) => {
+    return this.instance({
+      method: this.associateTenantConfig.Method,
+      url: this.associateTenantConfig.Endpoint,
+      data: payload,
+    });
+  };
 
-deAssociateTenant = async (payload) => {
-  return this.instance({
-    method: this.deAssociateTenantConfig.Method,
-    url: this.deAssociateTenantConfig.Endpoint,
-    data: payload,
-  });
-};
+  deAssociateTenant = async (payload) => {
+    return this.instance({
+      method: this.deAssociateTenantConfig.Method,
+      url: this.deAssociateTenantConfig.Endpoint,
+      data: payload,
+    });
+  };
 
-deleteProperty = async (propertyId) => {
-  return this.instance({
-    method: this.deletePropertyConfig.Method,
-    url: `${this.deletePropertyConfig.Endpoint}/${propertyId}`,
-  });
-};
+  deleteProperty = async (propertyId) => {
+    return this.instance({
+      method: this.deletePropertyConfig.Method,
+      url: `${this.deletePropertyConfig.Endpoint}/${propertyId}`,
+    });
+  };
 
-togglePropertyVisibilty = async (propertyId) => {
-  return this.instance({
-    method: this.togglePropertyVisibiltyConfig.Method,
-    url: `${this.togglePropertyVisibiltyConfig.Endpoint}/${propertyId}`,
-  });
-};
+  editProperty = async (propertyId, payload) => {
+    return this.instance({
+      method: this.editPropertyConfig.Method,
+      url: `${this.editPropertyConfig.Endpoint}/${propertyId}`,
+      data: payload,
+    });
+  };
+
+
+  togglePropertyVisibilty = async (propertyId) => {
+    return this.instance({
+      method: this.togglePropertyVisibiltyConfig.Method,
+      url: `${this.togglePropertyVisibiltyConfig.Endpoint}/${propertyId}`,
+    });
+  };
 
 
 

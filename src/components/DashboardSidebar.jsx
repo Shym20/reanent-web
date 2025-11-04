@@ -2,7 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import Logo from "../assets/images/logo.png";
 import { FiEdit2, FiHeart, FiHome, FiKey, FiX } from "react-icons/fi";
 import { IoBookmarksOutline, IoChatbubblesOutline, IoDocumentOutline, IoSearch } from "react-icons/io5";
-import { FaRegStarHalf } from "react-icons/fa6";
+import { FaPeopleRoof, FaRegStarHalf } from "react-icons/fa6";
 import { MdOutlineAddHome } from "react-icons/md";
 import { TbLayoutDashboard } from "react-icons/tb";
 import { TbHomeCheck } from "react-icons/tb";
@@ -21,40 +21,40 @@ const DashSidebar = ({ isOpen, onClose, role }) => {
   const user = reduxUser || localUser;
 
   const handleNavClick = () => {
-  if (window.innerWidth < 1024) {
-    onClose();
-  }
-  window.scrollTo({ top: 0, behavior: "smooth" });
-};
-
-const [profile, setProfile] = useState({
-  fullName: user?.fullName || "Guest User",
-  profilePicture: user?.profilePicture || ProfilePhoto,
-});
-
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const profileApi = new ProfileApi();
-      const res = await profileApi.getProfile();
-      if (res?.data?.user) {
-        setProfile(res.data.user);
-      }
-    } catch (err) {
-      console.error("Error fetching profile:", err);
+    if (window.innerWidth < 1024) {
+      onClose();
     }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  fetchProfile();
-}, []);
+  const [profile, setProfile] = useState({
+    fullName: user?.fullName || "Guest User",
+    profilePicture: user?.profilePicture || ProfilePhoto,
+  });
 
-const userName = profile?.fullName || "Guest User";
-const userPhoto = profile?.profilePicture || ProfilePhoto;
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profileApi = new ProfileApi();
+        const res = await profileApi.getProfile();
+        if (res?.data?.user) {
+          setProfile(res.data.user);
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const userName = profile?.fullName || "Guest User";
+  const userPhoto = profile?.profilePicture || ProfilePhoto;
 
 
 
 
-  
+
   return (
     <>
       {/* Overlay for mobile */}
@@ -66,9 +66,10 @@ const userPhoto = profile?.profilePicture || ProfilePhoto;
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white flex flex-col overflow-y-auto transform transition-transform duration-300 
-        ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static`}
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white flex flex-col overflow-y-auto hide-scrollbar transform transition-transform duration-300 
+  ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static`}
       >
+
         {/* Close button for mobile */}
         <div className="lg:hidden flex justify-end p-4">
           <button onClick={onClose}>
@@ -130,11 +131,23 @@ const userPhoto = profile?.profilePicture || ProfilePhoto;
                 } hover:bg-[#D7B56D] hover:text-white`
               }
             >
+              <FaPeopleRoof className="text-lg" /> Current Tenants
+            </NavLink>
+            <NavLink
+              to="/dashboard-owner/dashboard"
+              onClick={handleNavClick}
+              className={({ isActive }) =>
+                `flex gap-2 items-center px-2 py-2 rounded-lg ${isActive
+                  ? "bg-[#D7B56D] text-white"
+                  : "bg-white text-black"
+                } hover:bg-[#D7B56D] hover:text-white`
+              }
+            >
               <TbLayoutDashboard className="text-lg" /> Dashboard
             </NavLink>
             <NavLink
               to="/dashboard-owner/my-properties"
-             onClick={handleNavClick}
+              onClick={handleNavClick}
               className={({ isActive }) =>
                 `flex gap-2 items-center px-2 py-2 rounded-lg ${isActive
                   ? "bg-[#D7B56D] text-white"
@@ -265,6 +278,19 @@ const userPhoto = profile?.profilePicture || ProfilePhoto;
             </NavLink> */}
 
             <NavLink
+              to="/dashboard-tenant/channel"
+              onClick={handleNavClick}
+              className={({ isActive }) =>
+                `flex gap-2 items-center px-2 py-2 rounded-lg ${isActive
+                  ? "bg-[#033E4A] text-white"
+                  : "bg-white text-black"
+                } hover:bg-[#033E4A] hover:text-white`
+              }
+            >
+              <IoChatbubblesOutline className="text-lg" /> Properties Channels
+            </NavLink>
+
+            <NavLink
               to="/dashboard-tenant/my-interest"
               onClick={handleNavClick}
               className={({ isActive }) =>
@@ -318,7 +344,7 @@ const userPhoto = profile?.profilePicture || ProfilePhoto;
 
             <NavLink
               to="/dashboard-tenant/saved-properties"
-             onClick={handleNavClick}
+              onClick={handleNavClick}
               className={({ isActive }) =>
                 `flex gap-2 items-center px-2 py-2 rounded-lg ${isActive
                   ? "bg-[#033E4A] text-white"
