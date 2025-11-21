@@ -2,109 +2,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import { MapPinIcon, MagnifyingGlassIcon, FunnelIcon, XMarkIcon, HomeIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
 import { FaHeart, FaLandmark, FaShareAlt } from 'react-icons/fa';
 import { Range } from "react-range";
-
-import home1 from '../assets/images/home1.png'
-import home2 from '../assets/images/home2.png'
-import home3 from '../assets/images/home3.png'
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PropertyApi from '../apis/property/property.api';
-
-
-const propertiesWithMap = [
-  {
-    id: 1,
-    img: home1,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 2,
-    img: home2,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 3,
-    img: home3,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 4,
-    img: home1,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 5,
-    img: home2,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 6,
-    img: home3,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 7,
-    img: home3,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 8,
-    img: home2,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-  {
-    id: 9,
-    img: home1,
-    price: "₹15,000/month",
-    beds: "2 BHK",
-    baths: "1 bath",
-    area: "850 sq.ft (1,200 sq.ft plot)",
-    location: "Vijay Nagar, Indore, Madhya Pradesh – 452010",
-    tag: "For Rent",
-  },
-];
-
 
 const PropertyCard = ({ property }) => {
   const [currentImage, setCurrentImage] = useState(0);
@@ -304,7 +205,7 @@ const PropertiesList = () => {
           </button>
 
           {/* With Map Button */}
-          <div className="inline-flex rounded-lg border-2 border-[#E5E7EA] overflow-hidden">
+          {/* <div className="inline-flex rounded-lg border-2 border-[#E5E7EA] overflow-hidden">
             <button
               onClick={() => setSelected("withMap")}
               className={`px-5 py-1.5 m-0.5 text-sm font-medium ${selected === "withMap"
@@ -324,7 +225,7 @@ const PropertiesList = () => {
             >
               List
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -538,57 +439,8 @@ const PropertiesList = () => {
             )}
           </div>
 
-        ) : (
-          (selected === "withMap") ? (
-            // ✅ With Map View
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
-              {/* Left: Property Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto pr-4">
-                {propertiesWithMap.map((property) => (
-                  <div
-                    key={property.id}
-                    className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl hover:scale-102 transition-all duration-300 ease-in-out "
-                  >
-                    <div className="relative">
-                      <img
-                        src={property.img}
-                        alt={property.location}
-                        className="w-full h-64 object-cover"
-                      />
-                      <span className="absolute top-4 left-0 bg-[#033E4A] text-white px-3 py-1 rounded-r-md text-sm font-medium">
-                        {property.tag}
-                      </span>
-                    </div>
-                    <div className="p-4">
-                      <div className='flex justify-between items-center '>
-                        <h3 className="text-lg font-semibold">{property.price}</h3>
-                        <div className="flex gap-4 text-gray-500">
-                          <FaShareAlt className="cursor-pointer hover:text-[#033E4A]" />
-                          <FaHeart className="cursor-pointer hover:text-red-500" />
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{property.beds} • {property.baths} • {property.area}</p>
-                      <p className="text-gray-700 text-sm mt-2">{property.location}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Right: Map Placeholder */}
-              <div className="w-full h-[80vh] rounded-2xl shadow-lg">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14717.09614890894!2d75.88652044994416!3d22.755209269789884!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396302af403406fb%3A0x5b50834b117f8bab!2sVijay%20Nagar%2C%20Scheme%20No%2054%2C%20Indore%2C%20Madhya%20Pradesh%20452010!5e0!3m2!1sen!2sin!4v1755768503769!5m2!1sen!2sin"
-                  width="100%"
-                  height="100%"
-                  className="rounded-2xl border-0"
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-
-              </div>
-            </div>
-          ) : (<></>))}
+        ) 
+         : (<></>)}
       </section>
 
     </>

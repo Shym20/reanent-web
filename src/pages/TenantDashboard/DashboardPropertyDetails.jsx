@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
+import { RiFlag2Line } from "react-icons/ri";
 
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -15,13 +16,14 @@ import bathroom from "../../assets/images/home2.png";
 import garden from "../../assets/images/home3.png";
 import testimonialImg from '../../assets/icons/testimonial-icon.png'
 import testimonialBg from '../../assets/icons/testimonial-bg.png'
+import defaultPropertyImage from "../../assets/images/property-default-image.jpg"
 
-import { FaCar, FaStar, FaWater } from "react-icons/fa";
-import { FiHome, FiHeart, FiMaximize, FiUsers, FiShare2, FiWind, FiCalendar } from "react-icons/fi";
-import { MdCheckCircle } from "react-icons/md";
+import { FaFacebookF, FaStar, FaTwitter, FaWhatsapp } from "react-icons/fa";
+import { FiHome, FiHeart, FiMaximize, FiShare2, FiCopy, FiX } from "react-icons/fi";
+
 import { IoStar, IoStarOutline } from "react-icons/io5";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { LuSofa, LuCar } from "react-icons/lu";
+import { LuSofa } from "react-icons/lu";
 import { GoDotFill } from "react-icons/go";
 import { Link, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -77,7 +79,7 @@ const ratingStats = [
   { label: "Deposit", value: 50 },
 ];
 
-const PropertyImages = ({ images }) => {
+const PropertyImages = ({ images = [] }) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
 
@@ -87,68 +89,147 @@ const PropertyImages = ({ images }) => {
   }));
 
   const openGallery = (index) => {
+    if (!images.length) return;
     setStartIndex(index);
     setIsGalleryOpen(true);
   };
 
+  // Placeholder image
+  const placeholder =
+    defaultPropertyImage;
+
   return (
     <>
-      {/* Preview Grid */}
-      <div className="grid grid-cols-2 gap-2 mx-auto h-[500px]">
-        {/* First big image on left */}
-        <div className="relative h-[500px] cursor-pointer" onClick={() => openGallery(0)}>
+      {/* Handle Empty Images */}
+      {images.length === 0 ? (
+        <div className="flex items-center justify-center bg-gray-100 rounded-lg h-[400px]">
+          <img
+            src={placeholder}
+            alt="No property"
+            className="w-[300px] opacity-60"
+          />
+        </div>
+      ) : images.length === 1 ? (
+        // Single Image Layout
+        <div
+          className="h-[500px] cursor-pointer"
+          onClick={() => openGallery(0)}
+        >
           <img
             src={images[0]}
             alt="property"
             className="w-full h-[500px] object-cover rounded-lg"
           />
         </div>
-
-        {/* Right side images */}
-        <div className="grid grid-rows-2 gap-2">
-          {/* Top wide image */}
-          <div className="relative cursor-pointer" onClick={() => openGallery(1)}>
+      ) : images.length === 2 ? (
+        // Two Images Side by Side
+        <div className="grid grid-cols-2 gap-2 h-[500px]">
+          {images.map((img, idx) => (
+            <div
+              key={idx}
+              className="cursor-pointer"
+              onClick={() => openGallery(idx)}
+            >
+              <img
+                src={img}
+                alt="property"
+                className="w-full h-[500px] object-cover rounded-lg"
+              />
+            </div>
+          ))}
+        </div>
+      ) : images.length === 3 ? (
+        // Three Images Layout
+        <div className="grid grid-cols-2 gap-2 h-[500px]">
+          <div
+            className="row-span-2 cursor-pointer"
+            onClick={() => openGallery(0)}
+          >
+            <img
+              src={images[0]}
+              alt="property"
+              className="w-full h-[500px] object-cover rounded-lg"
+            />
+          </div>
+          <div
+            className="cursor-pointer"
+            onClick={() => openGallery(1)}
+          >
             <img
               src={images[1]}
               alt="property"
-              className="w-full h-[300px] object-cover rounded-lg"
+              className="w-full h-[245px] object-cover rounded-lg"
+            />
+          </div>
+          <div
+            className="cursor-pointer"
+            onClick={() => openGallery(2)}
+          >
+            <img
+              src={images[2]}
+              alt="property"
+              className="w-full h-[245px] object-cover rounded-lg"
+            />
+          </div>
+        </div>
+      ) : (
+        // Default Layout (4+ Images)
+        <div className="grid grid-cols-2 gap-2 mx-auto h-[500px]">
+          {/* Left large image */}
+          <div
+            className="relative h-[500px] cursor-pointer"
+            onClick={() => openGallery(0)}
+          >
+            <img
+              src={images[0]}
+              alt="property"
+              className="w-full h-[500px] object-cover rounded-lg"
             />
           </div>
 
-          {/* Bottom 2 small images */}
-          {/* Bottom 2 small images */}
-          <div className="grid grid-cols-2 gap-2">
-            {images.slice(2, 4).map((img, idx) => (
-              <div
-                key={idx}
-                className="relative cursor-pointer h-[190px] overflow-hidden rounded-lg"
-                onClick={() => openGallery(idx + 2)}
-              >
-                <img
-                  src={img}
-                  alt="property"
-                  className="w-full h-full object-cover"
-                />
+          {/* Right section */}
+          <div className="grid grid-rows-2 gap-2">
+            <div
+              className="relative cursor-pointer"
+              onClick={() => openGallery(1)}
+            >
+              <img
+                src={images[1]}
+                alt="property"
+                className="w-full h-[300px] object-cover rounded-lg"
+              />
+            </div>
 
-                {/* If it's the last image and more than 4 exist */}
-                {idx === 1 && images.length > 4 && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <span className="text-white text-xl font-semibold">
-                      +{images.length - 4}
-                    </span>
-                  </div>
-                )}
-              </div>
-            ))}
+            <div className="grid grid-cols-2 gap-2">
+              {images.slice(2, 4).map((img, idx) => (
+                <div
+                  key={idx}
+                  className="relative cursor-pointer h-[190px] overflow-hidden rounded-lg"
+                  onClick={() => openGallery(idx + 2)}
+                >
+                  <img
+                    src={img}
+                    alt="property"
+                    className="w-full h-full object-cover"
+                  />
+                  {idx === 1 && images.length > 4 && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="text-white text-xl font-semibold">
+                        +{images.length - 4}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-
         </div>
-      </div>
+      )}
 
       {/* Fullscreen Gallery */}
       {isGalleryOpen && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
-          <div className="w-full max-w-5xl">
+          <div className="w-full max-w-5xl relative">
             <button
               className="absolute top-4 right-6 text-white text-2xl z-50"
               onClick={() => setIsGalleryOpen(false)}
@@ -401,7 +482,6 @@ const ScheduleVisit = () => {
   );
 };
 
-
 const DashboardPropertyDetail = () => {
   const propertyImages = [
     house1,
@@ -415,7 +495,11 @@ const DashboardPropertyDetail = () => {
 
   const [message, setMessage] = useState("");
   const [activeTab, setActiveTab] = useState("chat");
-
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [description, setDescription] = useState("");
+  const [proof, setProof] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -470,6 +554,14 @@ const DashboardPropertyDetail = () => {
   return (
     <>
       <div className="bg-white rounded-xl mt-2 " >
+        <div className="bg-white p-4 sm:p-6 md:p-4 lg:px-4 rounded-2xl">
+          <h2 className="text-2xl font-bold text-[#D7B56D]">
+            {property.name
+              ? property.name.charAt(0).toUpperCase() + property.name.slice(1)
+              : ""}
+          </h2>
+        </div>
+
         <div className="p-4">
           <PropertyImages images={property.images || propertyImages} />
         </div>
@@ -501,9 +593,17 @@ const DashboardPropertyDetail = () => {
                   <button className="flex items-center gap-1 hover:text-red-500">
                     <FiHeart /> Save
                   </button>
-                  <button className="flex items-center gap-1 hover:text-blue-500">
+                  <button
+                    className="flex items-center gap-1 hover:text-blue-500"
+                    onClick={() => setShowShareModal(true)}
+                  >
                     <FiShare2 /> Share
                   </button>
+
+                  <button className="flex items-center gap-1 hover:text-red-700" onClick={() => setShowReportModal(true)}>
+                    <RiFlag2Line /> Report
+                  </button>
+
                 </div>
               </div>
 
@@ -611,20 +711,6 @@ const DashboardPropertyDetail = () => {
             <div className="flex-1">
               {/* Buttons */}
               <div className="flex gap-3 mb-5">
-                {/* <button onClick={() => setActiveTab("chat")}
-                  className={`px-4 py-2 rounded-lg font-medium ${activeTab === "chat"
-                    ? "bg-[#D7B56D] text-white"
-                    : "bg-gray-100 text-gray-700"
-                    }`}>
-                  Chat with Owner
-                </button> */}
-                {/* <button onClick={() => setActiveTab("schedule")}
-                  className={`px-4 py-2 rounded-lg font-medium ${activeTab === "schedule"
-                    ? "bg-[#D7B56D] text-white"
-                    : "bg-gray-100 text-gray-700"
-                    }`}>
-                  Schedule a Visit
-                </button> */}
                 <h2 className="font-semibold text-xl ">About Owner</h2>
               </div>
 
@@ -648,8 +734,8 @@ const DashboardPropertyDetail = () => {
                       type="button"
                       onClick={() => setMessage("Hi, I'm interested in this property")}
                       className={`border px-4 py-2 rounded-lg text-left hover:bg-teal-50 ${message === "Hi, I'm interested in this property"
-                          ? "border-teal-600 bg-teal-100"
-                          : "border-gray-300"
+                        ? "border-teal-600 bg-teal-100"
+                        : "border-gray-300"
                         }`}
                     >
                       Hi, I'm interested in this property
@@ -661,8 +747,8 @@ const DashboardPropertyDetail = () => {
                         setMessage("Hey, I want to schedule a visit for this property")
                       }
                       className={`border px-4 py-2 rounded-lg text-left hover:bg-teal-50 ${message === "Hey, I want to schedule a visit for this property"
-                          ? "border-teal-600 bg-teal-100"
-                          : "border-gray-300"
+                        ? "border-teal-600 bg-teal-100"
+                        : "border-gray-300"
                         }`}
                     >
                       Hey, I want to schedule a visit for this property
@@ -689,6 +775,181 @@ const DashboardPropertyDetail = () => {
         </section>
 
         <Testimonial />
+
+        {showReportModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white w-full max-w-lg rounded-xl shadow-xl p-6 animate-fadeIn">
+
+              {/* Header */}
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Report Property
+                </h2>
+                <button
+                  onClick={() => setShowReportModal(false)}
+                  className="text-gray-500 hover:text-black"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Reason */}
+              <div className="mt-4">
+                <label className="font-medium text-gray-700">Reason</label>
+                <select
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  className="w-full mt-1 border border-gray-300 rounded-lg p-2"
+                >
+                  <option value="">Select a reason</option>
+                  <option value="fake">Fake or fraudulent property</option>
+                  <option value="misleading">Incorrect or misleading information</option>
+                  <option value="price">Price manipulation or false pricing</option>
+                  <option value="unavailable">Already rented / unavailable</option>
+                  <option value="suspicious">Suspicious activity</option>
+                  <option value="stolen-images">Property images are stolen / do not match</option>
+                  <option value="offensive">Offensive or inappropriate content</option>
+                  <option value="safety">Safety concerns</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {/* Description */}
+              <div className="mt-4">
+                <label className="font-medium text-gray-700">Description</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full mt-1 border border-gray-300 rounded-lg p-2"
+                  rows={4}
+                  placeholder="Please describe the issue in detail..."
+                ></textarea>
+              </div>
+
+              {/* Proof Upload */}
+              <div className="mt-4">
+                <label className="font-medium text-gray-700">Upload Evidence (Optional)</label>
+                <input
+                  type="file"
+                  onChange={(e) => setProof(e.target.files[0])}
+                  className="w-full mt-2"
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  onClick={() => setShowReportModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  onClick={() => {
+                    if (!reportReason) {
+                      alert("Please select a reason.");
+                      return;
+                    }
+                    if (description.length < 20) {
+                      alert("Please provide at least 20 characters.");
+                      return;
+                    }
+
+                    // You will integrate API here:
+                    console.log({
+                      reason: reportReason,
+                      description,
+                      proof
+                    });
+
+                    setShowReportModal(false);
+                  }}
+                >
+                  Submit Report
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showShareModal && (
+          <div
+            className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50"
+            onClick={() => setShowShareModal(false)}
+          >
+            <div
+              className="bg-white w-100 p-6 rounded-xl shadow-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* HEADER */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Share Property</h2>
+                <button onClick={() => setShowShareModal(false)}>
+                  <FiX className="text-xl cursor-pointer hover:text-red-500" />
+                </button>
+              </div>
+
+              {/* SHARE LINK */}
+              <div className="flex items-center gap-2 border p-2 rounded-md bg-gray-100 mb-4">
+                <input
+                  type="text"
+                  readOnly
+                  value={`${window.location.origin}/dashboard-tenant/property-details/${property.property_id}`}
+                  className="bg-transparent w-full text-[16px] outline-none"
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/dashboard-tenant/property-details/${property.property_id}`
+                    );
+                    toast.success("Link Copied!");
+                  }}
+                >
+                  <FiCopy className="text-gray-600 cursor-pointer hover:text-black" />
+                </button>
+              </div>
+
+              {/* SOCIAL ICONS */}
+              <div className="flex justify-around text-2xl pt-3">
+                {/* WhatsApp */}
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    window.location.origin + "/property/" + property.property_id
+                  )}`}
+                  target="_blank"
+                  className="text-green-500"
+                >
+                  <FaWhatsapp />
+                </a>
+
+                {/* Facebook */}
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                    window.location.origin + "/property/" + property.property_id
+                  )}`}
+                  target="_blank"
+                  className="text-blue-600"
+                >
+                  <FaFacebookF />
+                </a>
+
+                {/* Twitter */}
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                    window.location.origin + "/property/" + property.property_id
+                  )}`}
+                  target="_blank"
+                  className="text-blue-400"
+                >
+                  <FaTwitter />
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
 
       </div>
     </>

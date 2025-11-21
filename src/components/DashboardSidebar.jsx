@@ -99,13 +99,13 @@ const DashSidebar = ({ isOpen, onClose, role }) => {
                 className={`absolute bottom-1 right-1 text-white p-1 rounded-full shadow-md ${role === "tenant" ? "bg-teal-600" : "bg-yellow-600"
                   }`}
               >
-                <FiEdit2 className="w-3 h-3" />
+                <FiEdit2 className="w-3 cursor-pointer h-3" />
               </button>
             </div>
           </Link>
           <p className="text-lg font-semibold text-gray-800">{userName}</p>
 
-          <div className="w-48 flex gap-4 items-center">
+          {/* <div className="w-48 flex gap-4 items-center">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
                 className={`h-2 rounded-full ${role === "tenant" ? "bg-teal-700" : "bg-yellow-500"
@@ -114,7 +114,7 @@ const DashSidebar = ({ isOpen, onClose, role }) => {
               ></div>
             </div>
             <p className="text-sm text-gray-600 text-right">70%</p>
-          </div>
+          </div> */}
         </div>
 
         {/* Navigation */}

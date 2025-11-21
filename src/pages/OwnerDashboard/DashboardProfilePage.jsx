@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../../redux/redux-slice/user.slice";
 import { getTokenLocal } from "../../utils/localStorage.util";
+import { State, City } from "country-state-city";
+
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -28,6 +30,10 @@ const DashboardProfilePage = () => {
   const [answers, setAnswers] = useState({});
   const [questions, setQuestions] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [state, setState] = useState("");
+  const [city, setCity] = useState("");
+  const [cityList, setCityList] = useState([]);
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -64,6 +70,52 @@ const DashboardProfilePage = () => {
     };
     fetchSurveyAnswers();
   }, []);
+
+  useEffect(() => {
+    const fetchSurveyData = async () => {
+      try {
+        // Get user answers
+        const resAnswers = await profileApi.getSurveyAnswers();
+        const userAnswers = Array.isArray(resAnswers.data?.questions)
+          ? resAnswers.data.questions
+          : [];
+
+        // Get full question definitions (with options)
+        const resConstants = await fetch(`${API_BASE_URL}/api/constants?key=7089887460`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        });
+        const constantsData = await resConstants.json();
+
+        const surveyData = constantsData?.data?.survey_questions || {};
+
+        // Merge user answers with question options
+        const mergedQuestions = Object.keys(surveyData).map((key) => {
+          const def = surveyData[key];
+          const existing = userAnswers.find((u) => u.question === def.question) || {};
+          return {
+            _id: existing._id || key, // fallback id
+            question: def.question,
+            options: def.enum || [],
+            answer: existing.answer || "",
+          };
+        });
+
+        setQuestions(mergedQuestions);
+
+        // Map answers using _id
+        const mappedAnswers = {};
+        mergedQuestions.forEach((q) => {
+          mappedAnswers[q._id] = q.answer || "";
+        });
+        setAnswers(mappedAnswers);
+      } catch (err) {
+        console.error("Error fetching merged survey data:", err);
+      }
+    };
+
+    fetchSurveyData();
+  }, []);
+
 
   const handleImageChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -225,7 +277,7 @@ const DashboardProfilePage = () => {
             </div>
 
             {/* State + City */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-[#24292E]">
                   Regional State
@@ -248,7 +300,57 @@ const DashboardProfilePage = () => {
                   <option>New York City</option>
                 </select>
               </div>
+            </div> */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              {/* State */}
+              <div>
+                <label className="block text-sm font-medium text-[#24292E]">
+                  Regional State
+                </label>
+                <select
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white"
+                  value={state}
+                  onChange={(e) => {
+                    const selectedState = e.target.value;
+                    setState(selectedState);
+
+                    // fetch cities of selected state
+                    const cityList = City.getCitiesOfState("IN", selectedState);
+                    setCity(""); // reset old city
+                    setCityList(cityList);
+                  }}
+                >
+                  <option value="">Select State</option>
+                  {State.getStatesOfCountry("IN").map((st) => (
+                    <option key={st.isoCode} value={st.isoCode}>
+                      {st.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* City */}
+              <div>
+                <label className="block text-sm font-medium text-[#24292E]">
+                  City
+                </label>
+                <select
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                >
+                  <option value="">Select City</option>
+                  {cityList?.map((c) => (
+                    <option key={c.name} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6">
@@ -285,32 +387,41 @@ const DashboardProfilePage = () => {
 
                 {editingId === q._id ? (
                   <div className="space-y-1">
-                    {q.options?.map((opt) => (
-                      <label
-                        key={opt}
-                        className={`flex items-center p-2 rounded-lg cursor-pointer border ${
-                          answers[q._id] === opt
+                    {q.options && q.options.length > 0 ? (
+                      // ✅ Multiple choice options
+                      q.options.map((opt) => (
+                        <label
+                          key={opt}
+                          className={`flex items-center p-2 rounded-lg cursor-pointer border ${answers[q._id] === opt
                             ? "bg-[#033E4A] text-white border-[#033E4A]"
                             : "bg-gray-50 hover:bg-gray-100 border-gray-200"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name={`q-${q._id}`}
-                          checked={answers[q._id] === opt}
-                          onChange={() => handleSurveyChange(q._id, opt)}
-                          className="hidden"
-                        />
-                        <span className="ml-2">{opt}</span>
-                      </label>
-                    ))}
+                            }`}
+                        >
+                          <input
+                            type="radio"
+                            name={`q-${q._id}`}
+                            checked={answers[q._id] === opt}
+                            onChange={() => handleSurveyChange(q._id, opt)}
+                            className="hidden"
+                          />
+                          <span className="ml-2">{opt}</span>
+                        </label>
+                      ))
+                    ) : (
+                      // ✅ Free text answer input (e.g., income)
+                      <input
+                        type="text"
+                        value={answers[q._id] || ""}
+                        onChange={(e) => handleSurveyChange(q._id, e.target.value)}
+                        placeholder="Enter your answer..."
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-teal-700 focus:outline-none"
+                      />
+                    )}
+
                     <button
                       onClick={async () => {
                         try {
-                          const res = await profileApi.updateSurveyAnswer(
-                            q._id,
-                            answers[q._id]
-                          );
+                          const res = await profileApi.updateSurveyAnswer(q._id, answers[q._id]);
                           if (res?.status === "success") {
                             toast.success("Survey answer updated");
                             setEditingId(null);
@@ -338,6 +449,7 @@ const DashboardProfilePage = () => {
                     </button>
                   </div>
                 )}
+
               </motion.div>
             ))
           ) : (

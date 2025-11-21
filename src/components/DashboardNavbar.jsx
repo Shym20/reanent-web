@@ -7,6 +7,7 @@ import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import logo from '../assets/images/logo.png'
 import { IoSearch } from "react-icons/io5";
 import { BellIcon } from "lucide-react";
+import logoSmall from "/favicon.png"
 
 export default function DashNav({ onToggleSidebar, role, setRole, sidebarOpen }) {
   const [showModal, setShowModal] = useState(false);
@@ -45,11 +46,18 @@ export default function DashNav({ onToggleSidebar, role, setRole, sidebarOpen })
           </button>
 
 
-          <Link to={'/'}
+          {/* <Link to={'/'}
 
-            className="md:hidden  text-gray-700"
+            className="hidden md:block  text-gray-700"
           >
             <img src={logo} className="w-40 " alt="" />
+          </Link> */}
+
+          <Link to={'/'}
+
+            className="block md:hidden w-30 text-gray-700"
+          >
+            <img src={logoSmall} className="w-9 ml-2 " alt="" />
           </Link>
 
           <NavLink
@@ -93,10 +101,9 @@ export default function DashNav({ onToggleSidebar, role, setRole, sidebarOpen })
               </button></Link>
           </div>
 
-          {/* Right side links */}
           <div className="relative">
             {/* Large screen links */}
-            <div className="hidden md:flex items-center gap-10 text-md">
+            <div className="flex ml-4 md:ml-0 items-center gap-10 text-md">
 
               <button
                 onClick={() => setShowModal(true)}
@@ -105,8 +112,6 @@ export default function DashNav({ onToggleSidebar, role, setRole, sidebarOpen })
                 <FiLogOut className="text-xl" />
               </button>
             </div>
-
-            {/* Small screen "Menu" */}
 
           </div>
         </div>

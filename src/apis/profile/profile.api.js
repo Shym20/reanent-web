@@ -35,6 +35,8 @@ class ProfileApi extends HttpClient {
   updateProfileConfig = ApiRoutes.Profile.UpdateProfile;
   getSurveyAnswersConfig = ApiRoutes.Profile.GetSurveyAnwers;
   updateSurveyAnswersConfig = ApiRoutes.Profile.UpdateSurveyAnwers;
+  searchPeopleConfig = ApiRoutes.Profile.SearchPeople;
+  searchPeopleDetailConfig = ApiRoutes.Profile.SearchPeopleDetail;
   
 
   getProfile = async (reqBody) => {
@@ -71,6 +73,23 @@ class ProfileApi extends HttpClient {
     data: { answer },
   });
 };
+
+ searchPeople = async (userId) => {
+  return this.instance({
+    method: this.searchPeopleConfig.Method,
+    url: `${this.searchPeopleConfig.Endpoint}?query=${userId}`,
+    headers: {},
+  });
+};
+
+searchPeopleDetail = async (userId) => {
+  return this.instance({
+    method: this.searchPeopleDetailConfig.Method,
+    url: `${this.searchPeopleDetailConfig.Endpoint}?userId=${userId}`,
+    headers: {},
+  });
+};
+
 
 }
 

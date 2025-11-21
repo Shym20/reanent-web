@@ -21,7 +21,7 @@ const ApiRoutes = {
       Method: HttpMethod.Post,
     },
     VerifyOtp: {
-      Endpoint: "/api/auth/verify-otp",  
+      Endpoint: "/api/auth/verify-otp",
       Method: HttpMethod.Post,
     },
     ResetPassword: {
@@ -38,13 +38,21 @@ const ApiRoutes = {
       Method: HttpMethod.Put,
       Endpoint: "/api/user/profile/update-profile",
     },
-    GetSurveyAnwers : {
+    GetSurveyAnwers: {
       Method: HttpMethod.Get,
       Endpoint: "/api/user/survey/get-all-answers",
     },
     UpdateSurveyAnwers: {
       Method: HttpMethod.Patch,
       Endpoint: "api/user/survey/update-answer/",
+    },
+    SearchPeople: {
+      Endpoint: "/api/user/profile/search",
+      Method: HttpMethod.Get,
+    },
+    SearchPeopleDetail: {
+      Endpoint: "/api/user/profile/search/details",
+      Method: HttpMethod.Get,
     },
   },
   Property: {
@@ -114,10 +122,14 @@ const ApiRoutes = {
       Endpoint: "api/user/property/tenant-approve",
       Method: HttpMethod.Patch,
     },
-     rejectStartTenancy: {
+    rejectStartTenancy: {
       Endpoint: "api/user/property/tenant-reject",
       Method: HttpMethod.Patch,
-    }
+    },
+    getMyCurrentStay: {
+      Endpoint: "api/user/property/stay/get-current-stay",
+      Method: HttpMethod.Get,
+    },
   },
   Owner: {
     getTenantInterests: {
@@ -153,6 +165,65 @@ const ApiRoutes = {
       Method: HttpMethod.Get,
     },
   },
+  Document: {
+    uploadDocument: {
+      Endpoint: "/api/user/property/document/upload",
+      Method: HttpMethod.Post,
+    },
+    getDocument: {
+      Endpoint: "/api/user/property/document/list",
+      Method: HttpMethod.Get,
+    },
+    deleteDocument: {
+      Endpoint: "/api/user/property/document/delete",
+      Method: HttpMethod.Delete,
+    },
+  },
+  Payment: {
+    manualPaymentEntry: {
+      Endpoint: "/api/user/property/payment/create",
+      Method: HttpMethod.Post,
+    },
+    getReminderPayment: {
+      Endpoint: "/api/user/property/payment/reminders",
+      Method: HttpMethod.Post,
+    },
+    getReminderPayment: {
+      Endpoint: "/api/user/property/payment/reminders",
+      Method: HttpMethod.Get,
+    },
+    getPaymentHistoryForProperty: {
+      Endpoint: "/api/user/property/payment/fetch",
+      Method: HttpMethod.Get,
+    },
+    createPayment: {
+      Endpoint: "api/user/property/payment/razorpay/create-order",
+      Method: HttpMethod.Post,
+    },
+  },
+  RatingAndRemoval: {
+    initiateRemovalByOwner: {
+      Endpoint: "/api/user/property/tenant-remove-request",
+      Method: HttpMethod.Patch,
+    },
+    checkRemoveStatus: {
+      Endpoint: "/api/user/property/check-remove-status",
+      Method: HttpMethod.Get,
+    },
+     actionOnDeAssociationByTenant: {
+      Endpoint: "/api/user/property/tenant-remove-action",
+      Method: HttpMethod.Patch,
+    },
+    initiateRemovalByTenant: {
+      Endpoint: "/api/user/property/tenant-leave-request",
+      Method: HttpMethod.Post,
+    },
+     actionOnDeAssociationByOwner: {
+      Endpoint: "/api/user/property/tenant-leave-action",
+      Method: HttpMethod.Patch,
+    },
+  },
+
 };
 
 export default ApiRoutes;

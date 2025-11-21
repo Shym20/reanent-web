@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import testimonialImg from "../../assets/icons/testimonial-icon.png";
 
-// ✅ Sample data for owner ratings
 const ownerTestimonials = [
   {
     name: "Mr. Sharma, Owner, Indore",
@@ -23,7 +22,6 @@ const ownerTestimonials = [
   },
 ];
 
-// ✅ Sample data for property ratings
 const propertyTestimonials = [
   {
     name: "Green Residency, Indore",
@@ -46,46 +44,55 @@ const propertyTestimonials = [
 ];
 
 const DashboardTenantGivenRatings = () => {
-  const [activeTab, setActiveTab] = useState("owner"); // 'owner' or 'property'
+  const [activeTab, setActiveTab] = useState("owner");
 
   const getCurrentTestimonials = () =>
     activeTab === "owner" ? ownerTestimonials : propertyTestimonials;
 
   return (
     <section className="mt-10 mx-auto px-4 md:px-8 lg:px-4">
-      {/* Heading */}
-      <h2 className="text-xl md:text-2xl font-bold text-[#033E4A] mb-5">
+      <h2 className="text-xl md:text-2xl pt-6 md:pt-0 font-bold text-[#033E4A] mb-5">
         Ratings You Gave
       </h2>
 
       {/* Tabs */}
-      <div className="flex sm:flex-row flex-col mb-7 justify-center items-center gap-2 p-1 border border-[#033E4A] shadow rounded-xl overflow-hidden w-full sm:w-fit"> <div>
-        <button
-          onClick={() => setActiveTab("property")}
-          className={`w-full sm:w-auto px-6 md:px-16 py-2 rounded-lg font-medium transition-all duration-300 ${activeTab === "property"
-              ? "bg-[#033E4A] text-white"
-              : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-        >
-          Property Review </button>
-        <button
-          onClick={() => setActiveTab("owner")}
-          className={`w-full sm:w-auto px-6 md:px-16 py-2 rounded-lg font-medium transition-all duration-300 ${activeTab === "owner"
-              ? "bg-[#033E4A] text-white"
-              : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-        >
-          Owner Review </button> </div> </div>
+      <div className="w-full flex md:justify-start justify-center mb-7">
+        <div className="flex flex-row sm:flex-row w-full sm:w-fit gap-2 p-1 border border-[#033E4A] shadow rounded-xl">
+          <button
+            onClick={() => setActiveTab("property")}
+            className={`flex-1 sm:flex-none px-4 py-2 sm:px-10 md:px-16 rounded-lg font-medium transition-all duration-300
+              ${activeTab === "property"
+                ? "bg-[#033E4A] text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"}
+            `}
+          >
+            Property Review
+          </button>
+
+          <button
+            onClick={() => setActiveTab("owner")}
+            className={`flex-1 sm:flex-none px-4 py-2 sm:px-10 md:px-16 rounded-lg font-medium transition-all duration-300
+              ${activeTab === "owner"
+                ? "bg-[#033E4A] text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"}
+            `}
+          >
+            Owner Review
+          </button>
+        </div>
+      </div>
 
       {/* Ratings Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {getCurrentTestimonials().map((item, index) => (
-          <div key={index} className="px-2">
-            <div className="relative rounded-xl p-6 pt-4 bg-white shadow-md transition-all duration-300 overflow-visible">
-              <p className="text-[#383F45] text-sm sm:text-base my-6 leading-relaxed">
+          <div key={index} className="w-full">
+            <div className="rounded-xl p-4 sm:p-6 bg-white shadow-md transition-all duration-300">
+              <p className="text-[#383F45] text-sm sm:text-base mt-2 mb-4 leading-relaxed">
                 {item.quote}
               </p>
-              <hr className="my-5 text-gray-200" />
+
+              <hr className="my-4 text-gray-200" />
+
               <h3 className="text-[#383F45] font-semibold text-sm sm:text-base">
                 {item.name}
               </h3>

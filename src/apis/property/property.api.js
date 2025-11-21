@@ -58,16 +58,6 @@ class PropertyApi extends HttpClient {
     });
   };
 
-  //   searchProperties = async ({ page = 1, limit = null }) => {
-  //   const queryParams = new URLSearchParams();
-  //   queryParams.append("page", page);
-  //   if (limit !== null) queryParams.append("limit", limit);
-
-  //   return this.instance({
-  //     method: this.searchPropertiesConfig.Method,
-  //     url: `${this.searchPropertiesConfig.Endpoint}${queryParams.toString()}`,
-  //   });
-  // };
 
   searchProperties = async (filters = {}) => {
     const queryParams = new URLSearchParams();
@@ -136,9 +126,6 @@ class PropertyApi extends HttpClient {
       url: `${this.togglePropertyVisibiltyConfig.Endpoint}/${propertyId}`,
     });
   };
-
-
-
 
 }
 

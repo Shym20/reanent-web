@@ -38,12 +38,12 @@ class OwnerApi extends HttpClient {
   getChannelConversationByIdConfig = ApiRoutes.Owner.getChannelConversationById;
 
 
-  getTenantInterests = async ({ status = "", page = 1, limit = 10 }) => {
-    return this.instance({
-      method: this.getTenantInterestsConfig.Method,
-      url: `${this.getTenantInterestsConfig.Endpoint}status=${status}&page=${page}&limit=${limit}`,
-    });
-  };
+ getTenantInterests = async ({ status = "", page = 1, limit = 10 }) => {
+  return this.instance({
+    method: this.getTenantInterestsConfig.Method,
+    url: `${this.getTenantInterestsConfig.Endpoint}status=${status}&page=${page}&limit=${limit}`,
+  });
+};
 
   updateInterestStatus = async (payload) => {
     return this.instance({

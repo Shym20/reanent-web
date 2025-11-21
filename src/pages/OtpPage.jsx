@@ -13,7 +13,7 @@ const OtpPage = () => {
   const navigate = useNavigate();
 
   const location = useLocation();
-  const contact = location.state?.contact || ""; // <-- unified field (mobile or email)
+  const contact = location.state?.mobileNumber || ""; // <-- unified field (mobile or email)
   const purpose = location.state?.purpose || "TO_VERIFY_USER";
 
   const isEmail = (value) => /\S+@\S+\.\S+/.test(value);

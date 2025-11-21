@@ -521,15 +521,15 @@ export default function OwnerDashboard() {
       >
         <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
         <div className="flex gap-4">
-         <Link to={'add-property'}>
-          <button className="bg-[#D7B56D] text-white px-4 py-2 rounded-xl flex items-center shadow hover:bg-[#c09d4f] transition">
-            <FiPlus className="mr-2" /> Add Property
-          </button>
+          <Link to={'add-property'}>
+            <button className="bg-[#D7B56D] text-white px-4 py-2 rounded-xl flex items-center shadow hover:bg-[#c09d4f] transition">
+              <FiPlus className="mr-2" /> Add Property
+            </button>
           </Link>
-         <Link to={'my-properties'}>
-          <button className="border border-[#D7B56D] text-[#D7B56D] px-4 py-2 rounded-xl hover:bg-[#D7B56D]/10 transition">
-            Manage Listings
-          </button>
+          <Link to={'my-properties'}>
+            <button className="border border-[#D7B56D] text-[#D7B56D] px-4 py-2 rounded-xl hover:bg-[#D7B56D]/10 transition">
+              Manage Listings
+            </button>
           </Link>
         </div>
       </motion.div>
@@ -538,18 +538,20 @@ export default function OwnerDashboard() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2 }}
-        className="bg-white rounded-2xl p-6 shadow-md mt-6"
+        transition={{ delay: 0.6 }}
+        className="bg-white rounded-2xl p-6 shadow-lg mt-6 border border-[#D7B56D]/20"
       >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
-          <h3 className="text-lg font-semibold">Rent Payment History</h3>
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+          <h3 className="text-xl font-semibold text-gray-800">Rent Payment History</h3>
 
           {/* Filters */}
           <div className="flex gap-3">
             <select
               value={propertyFilter}
               onChange={(e) => setPropertyFilter(e.target.value)}
-              className="border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B56D]"
+              className="border rounded-xl px-3 py-2 text-sm focus:outline-none 
+                   focus:ring-2 focus:ring-[#D7B56D] bg-white shadow-sm"
             >
               <option>All Properties</option>
               <option>2BHK Apartment</option>
@@ -560,7 +562,8 @@ export default function OwnerDashboard() {
             <select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
-              className="border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#D7B56D]"
+              className="border rounded-xl px-3 py-2 text-sm focus:outline-none 
+                   focus:ring-2 focus:ring-[#D7B56D] bg-white shadow-sm"
             >
               <option>All Time</option>
               <option>Last 2 Months</option>
@@ -569,40 +572,48 @@ export default function OwnerDashboard() {
           </div>
         </div>
 
-        {/* Table with horizontal scroll on mobile */}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px] text-sm border-collapse">
+        {/* Table Wrapper */}
+        <div className="overflow-x-auto rounded-lg border border-[#D7B56D]/20">
+          <table className="w-full min-w-[700px] text-sm">
+            {/* Table Head */}
             <thead>
-              <tr className="text-gray-600 border-b bg-[#D7B56D]/10">
-                <th className="py-3 px-4 text-left">Date</th>
-                <th className="py-3 px-4 text-left">Property</th>
-                <th className="py-3 px-4 text-left">Tenant</th>
-                <th className="py-3 px-4 text-left">Amount</th>
-                <th className="py-3 px-4 text-left">Paid via</th>
-                <th className="py-3 px-4 text-left">Status</th>
+              <tr className="bg-[#D7B56D]/20 text-gray-700 border-b">
+                <th className="py-3 px-4 text-left font-semibold">Date</th>
+                <th className="py-3 px-4 text-left font-semibold">Property</th>
+                <th className="py-3 px-4 text-left font-semibold">Tenant</th>
+                <th className="py-3 px-4 text-left font-semibold">Amount</th>
+                <th className="py-3 px-4 text-left font-semibold">Paid via</th>
+                <th className="py-3 px-4 text-left font-semibold">Status</th>
               </tr>
             </thead>
+
+            {/* Table Body */}
             <tbody>
               {paymentss.map((p, i) => (
                 <motion.tr
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 * i }}
-                  className="border-b hover:bg-[#D7B56D]/5 transition"
+                  transition={{ delay: 0.1 * i }}
+                  className="border-b last:border-0 hover:bg-[#D7B56D]/10 transition cursor-pointer"
                 >
                   <td className="py-3 px-4">{p.date}</td>
                   <td className="py-3 px-4">{p.property}</td>
                   <td className="py-3 px-4">{p.tenant}</td>
-                  <td className="py-3 px-4 font-medium">{p.amount}</td>
-                  <td className="py-3 px-4 font-medium">Phonepe</td>
-                  <td
-                    className={`py-3 px-4 font-semibold ${p.status === "Paid"
-                      ? "text-green-600"
-                      : "text-yellow-600"
-                      }`}
-                  >
-                    {p.status}
+                  <td className="py-3 px-4 font-medium text-gray-800">{p.amount}</td>
+                  <td className="py-3 px-4 font-medium text-gray-700">PhonePe</td>
+
+                  {/* Status pill */}
+                  <td className="py-3 px-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold
+                ${p.status === "Paid"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                        }`}
+                    >
+                      {p.status}
+                    </span>
                   </td>
                 </motion.tr>
               ))}

@@ -267,7 +267,7 @@ const DashboardAddProperty = () => {
         res = await propertyApi.postProperty({
           ...payload,
           property_id: "PROP-" + Date.now(),
-          owner: "68b945a33f4407e55853a9e9",
+          // owner: "68b945a33f4407e55853a9e9",
         });
       }
 
@@ -319,20 +319,6 @@ const DashboardAddProperty = () => {
         </div>
 
         <div className="flex  flex-col gap-6">
-          {/* Top disabled address (kept as in your UI) */}
-
-          {/* Google Map iframe (unchanged) */}
-          {/* <div className="w-full h-96 rounded-xl overflow-hidden">
-            <iframe
-              title="Google Map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3561.1732057595226!2d75.78727087534477!3d26.91243387667133!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db3a36e1f4d63%3A0xfbc93ef3db3e3f9!2sJaipur%2C%20Rajasthan!5e0!3m2!1sen!2sin!4v1692878430234!5m2!1sen!2sin"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-            />
-          </div> */}
 
           {/* Property Name */}
           <div>
@@ -492,8 +478,6 @@ const DashboardAddProperty = () => {
               className="mt-2 w-full border border-gray-300 rounded-xl p-3 placeholder-black focus:outline-none focus:ring-2 text-bold text-xl focus:ring-gray-500"
             />
           </div>
-
-          {/* Property Details (kept disabled like your UI) */}
 
           {/* Description */}
           <div>

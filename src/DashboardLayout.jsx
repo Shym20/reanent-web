@@ -38,7 +38,7 @@ export default function DashboardLayout() {
         <DashNav onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} role={role}  setRole={setRole} sidebarOpen={sidebarOpen}/>
 
         {/* Page content */}
-        <main className="flex-1 bg-white overflow-y-auto">
+        <main className="flex-1 bg-white overflow-y-auto overflow-x-hidden ">
           <div className="bg-gray-100 rounded-3xl shadow-md p-0 md:p-6 min-h-full">
             <Outlet />
           </div>

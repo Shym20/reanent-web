@@ -38,6 +38,7 @@ class TenantApi extends HttpClient {
   getAllSavedPropertyConfig = ApiRoutes.Tenant.getAllSavedProperty;
   acceptStartTenancyConfig = ApiRoutes.Tenant.acceptStartTenancy;
   rejectStartTenancyConfig = ApiRoutes.Tenant.rejectStartTenancy;
+  getMyCurrentStayConfig = ApiRoutes.Tenant.getMyCurrentStay;
 
 
 registerInterest = async (propertyId, message) => {
@@ -90,6 +91,14 @@ rejectStartTenancy = async (tenantStayId, remarks) => {
     method: this.rejectStartTenancyConfig.Method,
     url: this.rejectStartTenancyConfig.Endpoint,
     data: { tenantStayId, remarks },
+    headers: {},
+  });
+};
+
+getMyCurrentStay = async () => {
+  return this.instance({
+    method: this.getMyCurrentStayConfig.Method,
+    url: `${this.getMyCurrentStayConfig.Endpoint}`, 
     headers: {},
   });
 };

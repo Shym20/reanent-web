@@ -50,11 +50,11 @@ const testimonials = [
 
 const RatingCircles = ({ value }) => {
   const gradientShades = [
-    "#ef4444", // 1 - Red
-    "#f97316", // 2 - Orange-red
-    "#facc15", // 3 - Yellow
-    "#84cc16", // 4 - Yellow-green
-    "#16a34a", // 5 - Green
+    "#ef4444", 
+    "#f97316", 
+    "#facc15", 
+    "#84cc16", 
+    "#16a34a", 
   ];
 
   return (
@@ -73,7 +73,6 @@ const RatingCircles = ({ value }) => {
   );
 };
 
-
 const DashboardRating = () => {
   const [activeTab, setActiveTab] = useState("Property");
   const [selectedProperty, setSelectedProperty] = useState(propertyList[0].id);
@@ -85,7 +84,7 @@ const DashboardRating = () => {
     {/* Tabs Header */} <div className="flex justify-between mb-10 items-center"> <div className="flex sm:flex-row flex-col justify-center items-center gap-2 p-1 border border-[#D7B56D] shadow rounded-xl overflow-hidden w-full sm:w-fit"> <div>
       <button
         onClick={() => setActiveTab("Property")}
-        className={`w-full sm:w-auto px-6 md:px-16 py-2 rounded-lg font-medium transition-all duration-300 ${activeTab === "Property"
+        className={`w-full sm:w-auto px-6 md:px-16 py-2 rounded-l-lg font-medium transition-all duration-300 ${activeTab === "Property"
             ? "bg-[#D7B56D] text-white"
             : "bg-white text-gray-700 hover:bg-gray-50"
           }`}
@@ -93,12 +92,20 @@ const DashboardRating = () => {
         Property Review </button>
       <button
         onClick={() => setActiveTab("Owner")}
-        className={`w-full sm:w-auto px-6 md:px-16 py-2 rounded-lg font-medium transition-all duration-300 ${activeTab === "Owner"
+        className={`w-full sm:w-auto px-6 md:px-16 py-2  font-medium transition-all duration-300 ${activeTab === "Owner"
             ? "bg-[#D7B56D] text-white"
             : "bg-white text-gray-700 hover:bg-gray-50"
           }`}
       >
-        Tenant Review </button> </div> </div>
+        Tenant Review </button>
+         <button
+        onClick={() => setActiveTab("Tenant")}
+        className={`w-full sm:w-auto px-6 md:px-16 py-2 rounded-r-lg font-medium transition-all duration-300 ${activeTab === "Tenant"
+            ? "bg-[#D7B56D] text-white"
+            : "bg-white text-gray-700 hover:bg-gray-50"
+          }`}
+      >
+         Review by You </button> </div> </div>
 
 
       <Link to={"/owner-property-review"}>
@@ -202,6 +209,28 @@ const DashboardRating = () => {
         </div>
 
         <div className="md:col-span-2 w-full py-0 pb-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {testimonials.map((item, index) => (
+            <div key={index} className="px-2">
+              <div className="relative rounded-xl p-6 pt-4 bg-white shadow-md transition-all duration-300 overflow-visible">
+                <p className="text-[#383F45] text-sm sm:text-base my-6 leading-relaxed">
+                  {item.quote}
+                </p>
+                <hr className="my-5 text-gray-200" />
+                <h3 className="text-[#383F45] font-semibold text-sm sm:text-base">
+                  {item.name}
+                </h3>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+     {activeTab === "Tenant" && (
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4 items-start">
+
+        {/* Reviews Cards */}
+        <div className="md:col-span-2 w-full py-0 pb-8 grid grid-cols-1 sm:grid-cols-3 gap-2">
           {testimonials.map((item, index) => (
             <div key={index} className="px-2">
               <div className="relative rounded-xl p-6 pt-4 bg-white shadow-md transition-all duration-300 overflow-visible">

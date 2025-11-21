@@ -9,6 +9,7 @@ export default function Notifications() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const topRef = React.useRef(null);
 
   const fetchNotifications = async (pageNo = page) => {
     try {
@@ -33,10 +34,36 @@ export default function Notifications() {
     fetchNotifications();
   }, [page, limit]);
 
+ useEffect(() => {
+  if (!loading) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}, [loading]);
+
+
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto p-6 text-center text-gray-500">
-        Loading notifications...
+      <div ref={topRef} className="max-w-7xl mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-6 text-[#033E4A]">Notifications</h1>
+
+        <div className="bg-white rounded-2xl shadow p-4 animate-pulse">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="flex items-start gap-4 py-4 border-b border-gray-200 last:border-none"
+            >
+              {/* Icon skeleton */}
+              <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+
+              {/* Text skeleton */}
+              <div className="flex-1 space-y-2">
+                <div className="w-40 h-4 bg-gray-200 rounded"></div>
+                <div className="w-64 h-3 bg-gray-200 rounded"></div>
+                <div className="w-24 h-3 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -51,7 +78,7 @@ export default function Notifications() {
           No Notifications Yet
         </h2>
         <p className="text-gray-600 max-w-md">
-          You’re all caught up! When new updates or messages arrive, 
+          You’re all caught up! When new updates or messages arrive,
           they’ll show up here automatically.
         </p>
         <button
@@ -98,7 +125,9 @@ export default function Notifications() {
       <div className="flex justify-center items-center mt-6 gap-4">
         <button
           disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
+          onClick={() => {
+            setPage((p) => p - 1);
+          }}
           className="p-2 rounded-full border border-[#033E4A] text-[#033E4A] hover:bg-[#033E4A]/10 disabled:opacity-40 transition-all"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -110,12 +139,16 @@ export default function Notifications() {
 
         <button
           disabled={page >= totalPages}
-          onClick={() => setPage((p) => p + 1)}
+          onClick={() => {
+            setPage((p) => p + 1);
+
+          }}
           className="p-2 rounded-full border border-[#033E4A] text-[#033E4A] hover:bg-[#033E4A]/10 disabled:opacity-40 transition-all"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
+
     </div>
   );
 }

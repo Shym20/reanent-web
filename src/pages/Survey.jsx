@@ -14,13 +14,17 @@ export default function Survey() {
   const [loading, setLoading] = useState(true);
 
   const location = useLocation();
-  const contact = location.state?.contact || ""; // ✅ unified field (email or mobile)
+  const contact = location.state?.contact || ""; // email or mobile
 
   // Fetch questions
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/constants?key=7089887460`);
+        const res = await fetch(`${API_BASE_URL}/api/constants?key=7089887460`, {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        });
         const data = await res.json();
         if (data?.status === 200) {
           const surveyData = data.data.survey_questions;
@@ -45,20 +49,11 @@ export default function Survey() {
 
   const handleAnswer = (option) => {
     const questionObj = questions[currentQuestion];
-    let updatedAnswers;
-
-    if (option === "Other") {
-      setCustomAnswer("");
-      return;
-    } else {
-      updatedAnswers = [
-        ...answers.filter((a) => a.question !== questionObj.question),
-        { question: questionObj.question, answer: option },
-      ];
-      setAnswers(updatedAnswers);
-    }
-
-    goNext(updatedAnswers);
+    const updatedAnswers = [
+      ...answers.filter((a) => a.question !== questionObj.question),
+      { question: questionObj.question, answer: option },
+    ];
+    setAnswers(updatedAnswers);
   };
 
   const handleCustomSubmit = () => {
@@ -69,22 +64,34 @@ export default function Survey() {
         { question: questionObj.question, answer: customAnswer.trim() },
       ];
       setAnswers(updatedAnswers);
-      goNext(updatedAnswers);
     }
-  };
+  }; 
 
-  const goNext = async (updatedAnswers = answers) => {
+  const goNext = async () => {
+  const questionObj = questions[currentQuestion];
+
+  // --- FIX: Capture latest custom answer before submission ---
+  let updatedAnswers = [...answers];
+  if (questionObj.options === null && customAnswer.trim()) {
+    updatedAnswers = [
+      ...answers.filter((a) => a.question !== questionObj.question),
+      { question: questionObj.question, answer: customAnswer.trim() },
+    ];
+    setAnswers(updatedAnswers);
+  }
+
+  // --- Navigation or Submission ---
   if (currentQuestion < questions.length - 1) {
     setCurrentQuestion(currentQuestion + 1);
+    setCustomAnswer("");
   } else {
     try {
-      const uniqueFactor = contact; // ✅ email or mobile directly
       const res = await fetch(
-        `${API_BASE_URL}/api/user/survey/submit-answers/${uniqueFactor}`,
+        `${API_BASE_URL}/api/user/survey/submit-answers/${contact}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers: updatedAnswers }),
+          body: JSON.stringify({ answers: updatedAnswers }), 
         }
       );
 
@@ -102,13 +109,32 @@ export default function Survey() {
 };
 
 
+  const goBack = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+      setCustomAnswer("");
+    }
+  };
+
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading survey...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading survey...
+      </div>
+    );
   }
 
   if (questions.length === 0) {
-    return <div className="flex items-center justify-center min-h-screen">No survey questions found</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        No survey questions found
+      </div>
+    );
   }
+
+  const questionObj = questions[currentQuestion];
+  const currentAnswer =
+    answers.find((a) => a.question === questionObj.question)?.answer || "";
 
   return (
     <div
@@ -117,60 +143,78 @@ export default function Survey() {
     >
       <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-lg">
         <h2 className="text-lg font-bold mb-4">
-          {questions[currentQuestion].question}
+          {questionObj.question}
         </h2>
 
         <div className="space-y-3">
-          {questions[currentQuestion].options === null ? (
-            <div className="space-y-3">
+          {questionObj.options === null ? (
+            <>
               <input
                 type="text"
-                value={customAnswer}
+                value={customAnswer || currentAnswer}
                 onChange={(e) => setCustomAnswer(e.target.value)}
                 placeholder="Please write your answer..."
                 className="w-full p-3 rounded-xl border"
               />
-              <button
-                onClick={handleCustomSubmit}
-                className="w-full p-3 rounded-xl bg-[#033E4A] text-white hover:bg-[#055564] transition"
-              >
-                Submit
-              </button>
-            </div>
-          ) : (
-            <>
-              {answers.find((a) => a.question === questions[currentQuestion].question)?.answer === "" ? (
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    value={customAnswer}
-                    onChange={(e) => setCustomAnswer(e.target.value)}
-                    placeholder="Please specify..."
-                    className="w-full p-3 rounded-xl border"
-                  />
-                  <button
-                    onClick={handleCustomSubmit}
-                    className="w-full p-3 rounded-xl bg-[#033E4A] text-white hover:bg-[#055564] transition"
-                  >
-                    Submit
-                  </button>
-                </div>
-              ) : (
-                questions[currentQuestion].options.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleAnswer(option)}
-                    className="w-full p-3 rounded-xl bg-gray-100 hover:bg-[#033E4A] hover:text-white transition"
-                  >
-                    {option}
-                  </button>
-                ))
-              )}
             </>
+          ) : (
+            questionObj.options.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => handleAnswer(option)}
+                className={`w-full p-3 rounded-xl transition ${
+                  currentAnswer === option
+                    ? "bg-[#033E4A] text-white"
+                    : "bg-gray-100 hover:bg-[#033E4A] hover:text-white"
+                }`}
+              >
+                {option}
+              </button>
+            ))
           )}
         </div>
 
-        <p className="text-sm text-gray-400 mt-4">
+        <div className="flex justify-between mt-6">
+          <button
+            onClick={goBack}
+            disabled={currentQuestion === 0}
+            className={`px-5 py-2 rounded-xl font-medium ${
+              currentQuestion === 0
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            Back
+          </button>
+
+          {currentQuestion < questions.length - 1 ? (
+            <button
+              onClick={goNext}
+              disabled={!currentAnswer && !customAnswer.trim()}
+              className={`px-5 py-2 rounded-xl font-medium ${
+                !currentAnswer && !customAnswer.trim()
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-[#033E4A] text-white hover:bg-[#055564]"
+              }`}
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={goNext}
+              disabled={!currentAnswer && !customAnswer.trim()}
+              className={`px-5 py-2 rounded-xl font-medium ${
+                !currentAnswer && !customAnswer.trim()
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-green-600 text-white hover:bg-green-700"
+              }`}
+            >
+              Submit
+            </button>
+          )}
+        </div>
+
+        <p className="text-sm text-gray-400 mt-4 text-center">
           Question {currentQuestion + 1} of {questions.length}
         </p>
       </div>

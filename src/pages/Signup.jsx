@@ -7,7 +7,8 @@ import AuthApi from '../apis/auth/auth.api'
 
 const Signup = () => {
   const [fullName, setFullName] = useState("")
-  const [contact, setContact] = useState("") // <-- renamed from mobileNumber
+  const [email, setEmail] = useState("")
+const [mobileNumber, setMobileNumber] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -22,49 +23,69 @@ const Signup = () => {
   const isEmail = (value) => /\S+@\S+\.\S+/.test(value);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
+  e.preventDefault();
+  setError("");
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      return
-    }
+  // simple regex checks
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const mobileRegex = /^[6-9]\d{9}$/; // Indian 10-digit mobile numbers
 
-    try {
-      setLoading(true)
-
-      // decide payload
-      let payload = {
-        fullName,
-        password
-      }
-
-      if (isEmail(contact)) {
-        payload.email = contact
-      } else {
-        payload.mobileNumber = contact
-      }
-
-      const res = await authApi.signup(payload)
-
-      console.log("Register success:", res.data)
-
-      if (res.status === "success") {
-        navigate("/otp", { 
-          state: { 
-            contact, // send the same input back
-            purpose: "TO_VERIFY_USER" 
-          } 
-        }) 
-      }
-
-    } catch (err) {
-      console.error("Register error:", err)
-      setError(err.response?.data?.message || "Something went wrong")
-    } finally {
-      setLoading(false)
-    }
+  // validations
+  if (!fullName.trim()) {
+    setError("Please enter your full name");
+    return;
   }
+
+  if (!emailRegex.test(email)) {
+    setError("Please enter a valid email address");
+    return;
+  }
+
+  if (!mobileRegex.test(mobileNumber)) {
+    setError("Please enter a valid 10-digit mobile number");
+    return;
+  }
+
+  if (password.length < 6) {
+    setError("Password must be at least 6 characters long");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    setError("Passwords do not match");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const payload = {
+      fullName,
+      email,
+      mobileNumber,
+      password
+    };
+
+    const res = await authApi.signup(payload);
+
+    console.log("Register success:", res.data);
+
+    if (res.status === "success") {
+      navigate("/otp", {
+        state: {
+          mobileNumber,
+          purpose: "TO_VERIFY_USER"
+        }
+      });
+    }
+  } catch (err) {
+    console.error("Register error:", err);
+    setError(err.response?.data?.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div
@@ -97,18 +118,32 @@ const Signup = () => {
               />
             </div>
 
-            {/* Contact (Mobile or Email) */}
-            <div className="mb-4">
-              <p className="mb-1 font-poppins text-black">Mobile Number or Email</p>
-              <input
-                type="text"
-                required
-                value={contact}
-                onChange={(e) => setContact(e.target.value)}
-                className="w-full font-poppins rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-teal-600 border-2 border-[#E5E5E5]"
-                placeholder="Enter your mobile number or email"
-              />
-            </div>
+            {/* Email */}
+<div className="mb-4">
+  <p className="mb-1 font-poppins text-black">Email</p>
+  <input
+    type="email"
+    required
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    className="w-full font-poppins rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-teal-600 border-2 border-[#E5E5E5]"
+    placeholder="Enter your email"
+  />
+</div>
+
+{/* Mobile Number */}
+<div className="mb-4">
+  <p className="mb-1 font-poppins text-black">Mobile Number</p>
+  <input
+    type="text"
+    required
+    value={mobileNumber}
+    onChange={(e) => setMobileNumber(e.target.value)}
+    className="w-full font-poppins rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-teal-600 border-2 border-[#E5E5E5]"
+    placeholder="Enter your mobile number"
+  />
+</div>
+
 
             {/* Password */}
             <div className="relative mb-4">

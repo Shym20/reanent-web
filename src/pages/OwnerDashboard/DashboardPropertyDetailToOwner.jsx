@@ -275,44 +275,6 @@ const handleSendMessage = () => {
   )}
 </section>
 
-
-{/* Interested Tenants */}
-<section className="bg-white shadow rounded-2xl p-6">
-  <h3 className="text-xl font-semibold flex items-center gap-2 mb-4">
-    <FaUser /> Interested Tenants
-  </h3>
-
-  {interestedTenants.length > 0 ? (
-    <ul className="space-y-3">
-      {interestedTenants.map((tenant, idx) => (
-        <li
-          key={idx}
-          className="flex justify-between items-center p-4 bg-gray-50 rounded-xl shadow-sm hover:bg-gray-100 transition"
-        >
-          <div>
-            <p className="font-medium text-gray-800">{tenant.name}</p>
-            <p className="text-sm text-gray-600 flex items-center gap-2">
-              <FaEnvelope className="text-gray-400" /> {tenant.email}
-            </p>
-            <p className="text-sm text-gray-600 flex items-center gap-2">
-              <FaPhone className="text-gray-400" /> {tenant.phone}
-            </p>
-          </div>
-          <button
-            onClick={() => alert(`Contact request sent to ${tenant.name}`)}
-            className="bg-[#B28C3F] hover:bg-[#b27f1a] text-white px-4 py-2 rounded-lg shadow-md transition"
-          >
-            Contact
-          </button>
-        </li>
-      ))}
-    </ul>
-  ) : (
-    <p className="text-gray-500">No tenants have shown interest yet.</p>
-  )}
-</section>
-
-
       {/* Payment History (Grouped by Tenant) */}
       <section className="bg-white shadow rounded-2xl p-6">
         <h3 className="text-xl font-semibold flex items-center gap-2 mb-4">

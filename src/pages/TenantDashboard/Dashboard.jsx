@@ -4,8 +4,6 @@ import { FiHome, FiPlus, FiUsers, FiDollarSign, FiBell, FiUser, FiCalendar, FiSt
 import { getUserLocal } from "../../utils/localStorage.util";
 import { Link } from "react-router-dom";
 
-
-
 export function TenantRateOwnerPropertyModal({ isOpen, onClose, onSubmit, owner, property }) {
   if (!isOpen || !owner || !property) return null;
 
@@ -183,9 +181,6 @@ export function TenantRateOwnerPropertyModal({ isOpen, onClose, onSubmit, owner,
     </div>
   );
 }
-
-
-
 
 export default function TenantDashboard() {
 
